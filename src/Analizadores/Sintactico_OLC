@@ -1,0 +1,92 @@
+package Analizadores; 
+
+import Arbol_OLC.Entorno.Errores_OLC;
+import java.util.LinkedList;
+import java_cup.runtime.*;
+import Arbol_OLC.Instrucciones.*;
+import Arbol_OLC.*;
+
+parser code 
+{:   
+
+    public Arbol_OLC AST;
+    public void syntax_error(Symbol s){ 
+            Errores_OLC.agregar_error("Error de Orden de sentencia: "+s.value,s.left, s.right,"Sintactico");
+            System.err.println("Error Sintactico en la Linea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
+    } 
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+            System.err.println("Error sintactico irrecuperable en la Linea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido."); 
+    }  
+:} 
+
+/**
+*
+*TERMINALES
+*
+*/
+terminal String proyecto,ruta,nombre,correr,conf,archivo,fecha,carpeta,cadena;
+terminal String abrirllave,cerrarllave,coma,dospuntos;
+/**
+*
+* NO TERMINALES
+*
+*/
+non terminal Instruccion INICIO;
+non terminal Instruccion CUERPO;
+non terminal LinkedList<Instruccion> CUERPOPROYECTO;
+non terminal Instruccion PROPIEDAD;
+non terminal LinkedList<Instruccion> DIRECTORIOS;
+non terminal Instruccion ELEMENTO;
+non terminal Instruccion ARCHIVO;
+non terminal Instruccion CARPETA;
+non terminal LinkedList<Instruccion> CONFARCHIVO;
+non terminal Instruccion CONFA;
+
+
+start with INICIO; 
+
+
+INICIO ::= abrirllave CUERPO:a cerrarllave{:AST=new Arbol_OLC(a);:}
+;
+CUERPO::= proyecto:b dospuntos abrirllave CUERPOPROYECTO:a cerrarllave          {:RESULT = new PROYECTO(a,bleft,aright);:}
+;
+
+CUERPOPROYECTO::= CUERPOPROYECTO:a coma PROPIEDAD:b                             {:RESULT=a; RESULT.add(b);:}
+                |PROPIEDAD:a                                                    {:RESULT = new LinkedList(); RESULT.add(a);:}
+;
+
+PROPIEDAD::= ruta:a dospuntos cadena:b                                          {:RESULT = new PROPIEDAD(a,b,aleft,aright);:}
+            |nombre:a dospuntos cadena:b                                        {:RESULT = new PROPIEDAD(a,b,aleft,aright);:}
+            |correr:a dospuntos cadena:b                                        {:RESULT = new PROPIEDAD(a,b,aleft,aright);:}
+            |conf:a dospuntos abrirllave DIRECTORIOS:b cerrarllave              {:RESULT = new PROPIEDAD(a,b,aleft,aright);:}
+            |conf:a dospuntos abrirllave cerrarllave              {:RESULT = new PROPIEDAD(a,aleft,aright);:}
+;
+
+DIRECTORIOS ::= DIRECTORIOS:a coma ELEMENTO:b                                   {:RESULT=a; RESULT.add(b);:}
+                |ELEMENTO:a                                                     {:RESULT = new LinkedList(); RESULT.add(a);:}
+;
+
+
+ELEMENTO ::= ARCHIVO:a                                                          {:RESULT= a;:}
+            |CARPETA:a                                                          {:RESULT= a;:}
+;
+
+ARCHIVO ::= archivo:b dospuntos abrirllave CONFARCHIVO:a cerrarllave            {:RESULT = new ARCHIVO(a,bleft,bright);:}
+;
+
+CONFARCHIVO ::=CONFARCHIVO:a coma CONFA:b                                       {:RESULT=a; RESULT.add(b);:}
+               |CONFA:a                                                         {:RESULT = new LinkedList(); RESULT.add(a);:}
+;
+
+CONFA::= nombre:a dospuntos cadena:b                                            {:RESULT = new PROPIEDAD(a,b,aleft,aright);:}
+        |fecha:a dospuntos cadena:b                                             {:RESULT = new PROPIEDAD(a,b,aleft,aright);:}
+;
+
+CARPETA ::= carpeta:n dospuntos abrirllave nombre:a dospuntos cadena:b coma DIRECTORIOS:c cerrarllave    {:RESULT = new CARPETA(a,b,c,nleft,nright);:}
+            |carpeta:n dospuntos abrirllave DIRECTORIOS:c coma nombre:a dospuntos cadena:b  cerrarllave  {:RESULT = new CARPETA(a,b,c,nleft,nright);:}
+            |carpeta:n dospuntos abrirllave nombre:a dospuntos cadena:b  cerrarllave  {:RESULT = new CARPETA(a,b,null,nleft,nright);:}
+            |carpeta:n dospuntos abrirllave nombre:a dospuntos cadena:b coma cerrarllave  {:RESULT = new CARPETA(a,b,null,nleft,nright);:}
+            
+;
+
+

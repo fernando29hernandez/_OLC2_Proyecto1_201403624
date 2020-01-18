@@ -1,0 +1,93 @@
+package Analizadores;
+import java_cup.runtime.Symbol; 
+import Arbol_OLC.Entorno.Errores_OLC;
+%% 
+%cupsym Simbolo_O
+%class Lexico_O
+%public 
+%line 
+%char 
+%cup 
+%unicode
+
+%init{ 
+    yyline = 1; 
+    yychar = 1; 
+%init}  
+%{
+StringBuffer texto_auxiliar=new StringBuffer();
+String cadena_auxiliar = "";
+int bandera_regreso=0;
+%}
+
+Caracteres_no_importantes=[ \t\r\f\s\u2028|\u2029|\u000B|\u000C|\u0085]
+comentario_de_una_linea=("//".*\r\n)|("//".*\n)|("//".*\r)
+blancos=[ \r\t]+
+
+
+%state COMENTARIOS, RECONOCER_CADENA
+%%
+/***************************************** PALABRAS RESERVADAS ***********************************************/
+<YYINITIAL> "proyecto"        {System.out.println(yytext());return new Symbol(Simbolo_OLC.proyecto,yyline,yychar, yytext());} 
+<YYINITIAL> "ruta"            {System.out.println(yytext());return new Symbol(Simbolo_OLC.ruta,yyline,yychar, yytext());} 
+<YYINITIAL> "nombre"          {System.out.println(yytext());return new Symbol(Simbolo_OLC.nombre,yyline,yychar, yytext());} 
+<YYINITIAL> "correr"          {System.out.println(yytext());return new Symbol(Simbolo_OLC.correr,yyline,yychar, yytext());} 
+<YYINITIAL> "configuracion"   {System.out.println(yytext());return new Symbol(Simbolo_OLC.conf,yyline,yychar, yytext());} 
+<YYINITIAL> "archivo"         {System.out.println(yytext());return new Symbol(Simbolo_OLC.archivo,yyline,yychar, yytext());} 
+<YYINITIAL> "fecha_mod"       {System.out.println(yytext());return new Symbol(Simbolo_OLC.fecha,yyline,yychar, yytext());} 
+<YYINITIAL> "carpeta"         {System.out.println(yytext());return new Symbol(Simbolo_OLC.carpeta,yyline,yychar, yytext());} 
+/**-------------------------------------------------------------------------------------------------------**/
+
+/************************************************* ESTADO DE CADENA  *****************************/
+
+<YYINITIAL> "\""                    {yybegin(RECONOCER_CADENA); cadena_auxiliar = ""; }
+<RECONOCER_CADENA> "\""             {System.out.println(cadena_auxiliar);yybegin(YYINITIAL); return new Symbol(Simbolo_OLC.cadena,yyline,yychar,cadena_auxiliar);}
+
+/*------------------------------------------------------------------------------------------------------ */
+/************************************************* CARACTERES DE ESCAPE  *****************************/
+<RECONOCER_CADENA> "\'"              {cadena_auxiliar = cadena_auxiliar + "\'"; }
+<RECONOCER_CADENA> "\\\""            {cadena_auxiliar = cadena_auxiliar + "\""; }
+<RECONOCER_CADENA> "\\?"             {cadena_auxiliar = cadena_auxiliar + "?"; }
+<RECONOCER_CADENA> "\\n"             {cadena_auxiliar = cadena_auxiliar + "\n"; }
+<RECONOCER_CADENA> \\\\              {cadena_auxiliar = cadena_auxiliar + "\\"; }
+<RECONOCER_CADENA> "\\0"             {cadena_auxiliar = cadena_auxiliar + '\0'; }
+<RECONOCER_CADENA> "\\b"             {cadena_auxiliar = cadena_auxiliar + '\b'; }
+<RECONOCER_CADENA> "\\f"             {cadena_auxiliar = cadena_auxiliar + '\f'; }
+<RECONOCER_CADENA> "\\r"             {cadena_auxiliar = cadena_auxiliar + '\r'; }
+<RECONOCER_CADENA> "\\t"             {cadena_auxiliar = cadena_auxiliar + '\t'; }
+<RECONOCER_CADENA> "\%"              {cadena_auxiliar = cadena_auxiliar + '%'; }
+/*------------------------------------------------------------------------------------------------------ */
+<RECONOCER_CADENA> .                {cadena_auxiliar = cadena_auxiliar + yytext(); }
+/************************************ SIGNOS DE EXPRESIONES **************************************************/
+<YYINITIAL> "{"    {System.out.println(yytext());return new Symbol(Simbolo_OLC.abrirllave,yyline,yychar, yytext());} 
+<YYINITIAL> "}"    {System.out.println(yytext());return new Symbol(Simbolo_OLC.cerrarllave,yyline,yychar, yytext());} 
+<YYINITIAL> ","    {System.out.println(yytext());return new Symbol(Simbolo_OLC.coma,yyline,yychar, yytext());} 
+<YYINITIAL> ":"    {System.out.println(yytext());return new Symbol(Simbolo_OLC.dospuntos,yyline,yychar, yytext());} 
+/*------------------------------------------------------------------------------------------------------ */
+
+
+<YYINITIAL> {blancos} {}
+<YYINITIAL> {comentario_de_una_linea} {yychar=1;System.out.println(yytext());}
+<YYINITIAL> [\n] {yychar=1;}
+<YYINITIAL> {Caracteres_no_importantes} { }
+
+
+/********* COMENTARIO MULTILINEA **********************/
+<YYINITIAL> "/*" {yybegin(COMENTARIOS);}
+<COMENTARIOS> "*/" {yybegin(YYINITIAL);}
+<COMENTARIOS> \n { yychar=1;}
+<COMENTARIOS> . {}
+/*------------------------------------------------------------------------------------------------------ */
+
+
+/********* ERRORES **********************/
+
+<YYINITIAL>. {
+    Errores_OLC.agregar_error("Caracter no reconocido: "+yytext(),yyline, yychar,"Lexico");
+        
+}
+. {
+    Errores_OLC.agregar_error("Caracter no reconocido: "+yytext(),yyline, yychar,"Lexico");
+}
+/*------------------------------------------------------------------------------------------------------ */
+

@@ -1,0 +1,277 @@
+package analizadores;
+import java_cup.runtime.Symbol; 
+import java.util.ArrayList;
+%% 
+%cupsym Simbolo
+%class Lexico
+%public 
+%line 
+%char 
+%cup 
+%unicode
+%init{ 
+    yyline = 1; 
+    yychar = 1; 
+%init}  
+%{
+
+ArrayList<Errores.Error_Lexico> Errores = new ArrayList<Errores.Error_Lexico>();
+String texto_auxiliar=new String();
+StringBuffer metodo_auxiliar=new StringBuffer();
+int bandera_regreso=0;
+%}
+Caracteres_no_importantes=[ \t\r\f\s\u2028|\u2029|\u000B|\u000C|\u0085]
+numero=([0-9]+) | ([0-9]+ "\." [0-9]+)
+identificador=[A-Za-z\_]+[\_0-9A-Za-z]*
+Cadena = [\"] [^\"]* [\"]
+finlinea = \r|\n|\r\n
+caracternormal = [^\r\n]
+Comentario = {comentariomultilinea} | {Comentariodeunalinea} 
+comentariomultilinea   = "#$"  ( [^$] | \$+ [^#$] )* "$"+"#"
+Llamada = "{"  ( [^}] )* "}"
+Contenido = ( [^$] | \$+ [^#$] )
+Comentariodeunalinea     = "##" {caracternormal}* {finlinea}
+%state TEXTO, COMENTARIOSIMPLE,COMENTARIOMULTILINEA,LLAMADAMETODO,VERIFICACIONETIQUETA,INTERMEDIO,TEXTOVERIFICACION,POSIBLETEXTO
+%state COMENTARIOSIMPLE1,COMENTARIOMULTILINEA1,COMENTARIOSIMPLE2,COMENTARIOMULTILINEA2,TEXTOFINAL,TEXTOENCAPSULADO
+%%
+<YYINITIAL> "=" {System.out.println(yytext());return new Symbol(Simbolo.igual,yyline,yychar, yytext());} 
+<YYINITIAL> "<" {System.out.println(yytext());return new Symbol(Simbolo.abrir,yyline,yychar, yytext());} 
+<YYINITIAL> ">" {System.out.println(yytext());return new Symbol(Simbolo.cerrar,yyline,yychar, yytext());} 
+<YYINITIAL> "contenedor" {System.out.println(yytext());return new Symbol(Simbolo.contenedor,yyline,yychar, yytext());} 
+<YYINITIAL> "/contenedor" {System.out.println(yytext());return new Symbol(Simbolo.contenedorc,yyline,yychar, yytext());} 
+<YYINITIAL> "ventana" {System.out.println(yytext());return new Symbol(Simbolo.ventana,yyline,yychar, yytext());}
+<YYINITIAL> "/ventana" {System.out.println(yytext());return new Symbol(Simbolo.ventanac,yyline,yychar, yytext());}
+<YYINITIAL> "control" {System.out.println(yytext());return new Symbol(Simbolo.control,yyline,yychar, yytext());}
+<YYINITIAL> "/control" {System.out.println(yytext());return new Symbol(Simbolo.controlc,yyline,yychar, yytext());}
+<YYINITIAL> "listadatos" {System.out.println(yytext());return new Symbol(Simbolo.listadatos,yyline,yychar, yytext());}
+<YYINITIAL> "/listadatos" {System.out.println(yytext());return new Symbol(Simbolo.listadatosc,yyline,yychar, yytext());}
+<YYINITIAL> "multimedia" {System.out.println(yytext());return new Symbol(Simbolo.multimedia,yyline,yychar, yytext());}
+<YYINITIAL> "/multimedia" {System.out.println(yytext());return new Symbol(Simbolo.multimediac,yyline,yychar, yytext());}
+
+<YYINITIAL> {Comentario} {System.out.println(yytext());}
+
+<YYINITIAL> "boton" {yybegin(VERIFICACIONETIQUETA);System.out.println(yytext());return new Symbol(Simbolo.boton,yyline,yychar, yytext());}
+<YYINITIAL> "/boton" {System.out.println(yytext());return new Symbol(Simbolo.botonc,yyline,yychar, yytext());}
+<YYINITIAL> "enviar" {yybegin(VERIFICACIONETIQUETA);System.out.println(yytext());return new Symbol(Simbolo.enviar,yyline,yychar, yytext());}
+<YYINITIAL> "/enviar" {System.out.println(yytext());return new Symbol(Simbolo.enviarc,yyline,yychar, yytext());}
+<YYINITIAL> "importar" {yybegin(INTERMEDIO);System.out.println(yytext());return new Symbol(Simbolo.importar,yyline,yychar, yytext());}
+<YYINITIAL> "/importar" {System.out.println(yytext());return new Symbol(Simbolo.importarc,yyline,yychar, yytext());}
+<YYINITIAL> "texto" {yybegin(INTERMEDIO);System.out.println(yytext());return new Symbol(Simbolo.texto,yyline,yychar, yytext());}
+<YYINITIAL> "/texto" {System.out.println(yytext());return new Symbol(Simbolo.textoc,yyline,yychar, yytext());}
+<YYINITIAL> "dato" {yybegin(INTERMEDIO);System.out.println(yytext()); return new Symbol(Simbolo.dato,yyline,yychar, yytext());}
+<YYINITIAL> "/dato" {System.out.println(yytext());return new Symbol(Simbolo.datoc,yyline,yychar, yytext());}
+<YYINITIAL> "defecto" {yybegin(INTERMEDIO);System.out.println(yytext());return new Symbol(Simbolo.defecto,yyline,yychar, yytext());}
+<YYINITIAL> "/defecto" {System.out.println(yytext());return new Symbol(Simbolo.defectoc,yyline,yychar, yytext());}
+
+
+<YYINITIAL> "id" {System.out.println(yytext());return new Symbol(Simbolo.id,yyline,yychar, yytext());} 
+<YYINITIAL> "tipo" {System.out.println(yytext());return new Symbol(Simbolo.tipo,yyline,yychar, yytext());} 
+<YYINITIAL> "color" {System.out.println(yytext());return new Symbol(Simbolo.color,yyline,yychar, yytext());} 
+<YYINITIAL> "accioninicial" {System.out.println(yytext());return new Symbol(Simbolo.accioninicial,yyline,yychar, yytext());} 
+<YYINITIAL> "accionfinal" {System.out.println(yytext());return new Symbol(Simbolo.accionfinal,yyline,yychar, yytext());} 
+<YYINITIAL> "x" {System.out.println(yytext());return new Symbol(Simbolo.x,yyline,yychar, yytext());} 
+<YYINITIAL> "y" {System.out.println(yytext());return new Symbol(Simbolo.y,yyline,yychar, yytext());} 
+<YYINITIAL> "alto" {System.out.println(yytext());return new Symbol(Simbolo.alto,yyline,yychar, yytext());} 
+<YYINITIAL> "ancho" {System.out.println(yytext());return new Symbol(Simbolo.ancho,yyline,yychar, yytext());} 
+<YYINITIAL> "borde" {System.out.println(yytext());return new Symbol(Simbolo.borde,yyline,yychar, yytext());} 
+<YYINITIAL> "fuente" {System.out.println(yytext());return new Symbol(Simbolo.fuente,yyline,yychar, yytext());} 
+<YYINITIAL> "tam" {System.out.println(yytext());return new Symbol(Simbolo.tam,yyline,yychar, yytext());} 
+<YYINITIAL> "negrita" {System.out.println(yytext());return new Symbol(Simbolo.negrita,yyline,yychar, yytext());} 
+<YYINITIAL> "cursiva" {System.out.println(yytext());return new Symbol(Simbolo.cursiva,yyline,yychar, yytext());} 
+<YYINITIAL> "nombre" {System.out.println(yytext());return new Symbol(Simbolo.nombre,yyline,yychar, yytext());} 
+<YYINITIAL> "maximo" {System.out.println(yytext());return new Symbol(Simbolo.maximo,yyline,yychar, yytext());} 
+<YYINITIAL> "minimo" {System.out.println(yytext());return new Symbol(Simbolo.minimo,yyline,yychar, yytext());} 
+<YYINITIAL> "accion" {System.out.println(yytext());return new Symbol(Simbolo.accion,yyline,yychar, yytext());} 
+<YYINITIAL> "referencia" {System.out.println(yytext());return new Symbol(Simbolo.referencia,yyline,yychar, yytext());} 
+<YYINITIAL> "path" {System.out.println(yytext());return new Symbol(Simbolo.path,yyline,yychar, yytext());} 
+<YYINITIAL> "auto-reproduccion" {System.out.println(yytext());return new Symbol(Simbolo.reproduccion,yyline,yychar, yytext());} 
+<YYINITIAL> {numero} {System.out.println(yytext()); return new Symbol(Simbolo.numero,yyline,yychar, yytext());} 
+<YYINITIAL>{Cadena} {String cadenasincomillas=yytext();
+                        cadenasincomillas = cadenasincomillas.substring(1,cadenasincomillas.length()-1);
+                        System.out.println(cadenasincomillas);
+                         return new Symbol(Simbolo.Cadena, yyline,yychar,cadenasincomillas);}
+<YYINITIAL> "verdadero" {System.out.println(yytext());return new Symbol(Simbolo.verdadero,yyline,yychar, yytext());} 
+<YYINITIAL> "falso" {System.out.println(yytext());return new Symbol(Simbolo.falso,yyline,yychar, yytext());} 
+<YYINITIAL>{Llamada} {String cadenasincomillas=yytext();
+                        cadenasincomillas = cadenasincomillas.substring(1,cadenasincomillas.length()-1);
+                        System.out.println(cadenasincomillas);
+                         return new Symbol(Simbolo.llamadametodo, yyline,yychar,cadenasincomillas);}
+
+<YYINITIAL> [\n] {yychar=1;}
+<YYINITIAL> {Caracteres_no_importantes} { }
+
+
+<INTERMEDIO> {Comentario} {System.out.println(yytext());}
+
+<INTERMEDIO> ">" {texto_auxiliar= new String();yybegin(TEXTO);System.out.println(yytext());return new Symbol(Simbolo.cerrar,yyline,yychar, yytext());} 
+<INTERMEDIO> "=" {System.out.println(yytext());return new Symbol(Simbolo.igual,yyline,yychar, yytext());} 
+<INTERMEDIO> "id" {System.out.println(yytext());return new Symbol(Simbolo.id,yyline,yychar, yytext());} 
+<INTERMEDIO> "tipo" {System.out.println(yytext());return new Symbol(Simbolo.tipo,yyline,yychar, yytext());} 
+<INTERMEDIO> "color" {System.out.println(yytext());return new Symbol(Simbolo.color,yyline,yychar, yytext());} 
+<INTERMEDIO> "accioninicial" {System.out.println(yytext());return new Symbol(Simbolo.accioninicial,yyline,yychar, yytext());} 
+<INTERMEDIO> "accionfinal" {System.out.println(yytext());return new Symbol(Simbolo.accionfinal,yyline,yychar, yytext());} 
+<INTERMEDIO> "x" {System.out.println(yytext());return new Symbol(Simbolo.x,yyline,yychar, yytext());} 
+<INTERMEDIO> "y" {System.out.println(yytext());return new Symbol(Simbolo.y,yyline,yychar, yytext());} 
+<INTERMEDIO> "alto" {System.out.println(yytext());return new Symbol(Simbolo.alto,yyline,yychar, yytext());} 
+<INTERMEDIO> "ancho" {System.out.println(yytext());return new Symbol(Simbolo.ancho,yyline,yychar, yytext());} 
+<INTERMEDIO> "borde" {System.out.println(yytext());return new Symbol(Simbolo.borde,yyline,yychar, yytext());} 
+<INTERMEDIO> "fuente" {System.out.println(yytext());return new Symbol(Simbolo.fuente,yyline,yychar, yytext());} 
+<INTERMEDIO> "tam" {System.out.println(yytext());return new Symbol(Simbolo.tam,yyline,yychar, yytext());} 
+<INTERMEDIO> "negrita" {System.out.println(yytext());return new Symbol(Simbolo.negrita,yyline,yychar, yytext());} 
+<INTERMEDIO> "cursiva" {System.out.println(yytext());return new Symbol(Simbolo.cursiva,yyline,yychar, yytext());} 
+<INTERMEDIO> "nombre" {System.out.println(yytext());return new Symbol(Simbolo.nombre,yyline,yychar, yytext());} 
+<INTERMEDIO> "maximo" {System.out.println(yytext());return new Symbol(Simbolo.maximo,yyline,yychar, yytext());} 
+<INTERMEDIO> "minimo" {System.out.println(yytext());return new Symbol(Simbolo.minimo,yyline,yychar, yytext());} 
+<INTERMEDIO> "accion" {System.out.println(yytext());return new Symbol(Simbolo.accion,yyline,yychar, yytext());} 
+<INTERMEDIO> "referencia" {System.out.println(yytext());return new Symbol(Simbolo.referencia,yyline,yychar, yytext());} 
+<INTERMEDIO> "path" {System.out.println(yytext());return new Symbol(Simbolo.path,yyline,yychar, yytext());} 
+<INTERMEDIO> "auto-reproduccion" {System.out.println(yytext());return new Symbol(Simbolo.reproduccion,yyline,yychar, yytext());} 
+<INTERMEDIO> {numero} {System.out.println(yytext()); return new Symbol(Simbolo.numero,yyline,yychar, yytext());} 
+<INTERMEDIO> {Cadena} {String cadenasincomillas=yytext();
+                        cadenasincomillas = cadenasincomillas.substring(1,cadenasincomillas.length()-1);
+                        System.out.println(cadenasincomillas);
+                         return new Symbol(Simbolo.Cadena, yyline,yychar,cadenasincomillas);}
+<INTERMEDIO> "verdadero" {System.out.println(yytext());return new Symbol(Simbolo.verdadero,yyline,yychar, yytext());} 
+<INTERMEDIO> "falso" {System.out.println(yytext());return new Symbol(Simbolo.falso,yyline,yychar, yytext());} 
+<INTERMEDIO> [\n] {yychar=1;}
+<INTERMEDIO> {Caracteres_no_importantes} { }
+<INTERMEDIO>{Llamada} {String cadenasincomillas=yytext();
+                        cadenasincomillas = cadenasincomillas.substring(1,cadenasincomillas.length()-1);
+                        System.out.println(cadenasincomillas);
+                         return new Symbol(Simbolo.llamadametodo, yyline,yychar,cadenasincomillas);}
+
+<TEXTO> "##"   {yybegin(COMENTARIOSIMPLE);}
+<TEXTO> "#$"   {yybegin(COMENTARIOMULTILINEA);}
+<TEXTO> {Caracteres_no_importantes} { texto_auxiliar+=yytext(); }
+<TEXTO> [^<]   { texto_auxiliar+=yytext(); }
+<TEXTO> "<"    {yybegin(YYINITIAL);System.out.println("SALIDA"+texto_auxiliar+"AQUI TERMINA"); return new Symbol(Simbolo.textoentrelineas,yyline,yychar, texto_auxiliar);}
+
+
+
+<COMENTARIOSIMPLE> {caracternormal} {}
+<COMENTARIOSIMPLE> {finlinea} {yybegin(TEXTO);}
+
+
+<COMENTARIOMULTILINEA> {Contenido} {yybegin(TEXTO);}
+<COMENTARIOMULTILINEA> [^#] {}
+
+<VERIFICACIONETIQUETA> {Comentario} {System.out.println(yytext());}
+
+<VERIFICACIONETIQUETA> ">" {texto_auxiliar= new String();yybegin(TEXTOVERIFICACION);System.out.println(yytext());return new Symbol(Simbolo.cerrar,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "=" {System.out.println(yytext());return new Symbol(Simbolo.igual,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "id" {System.out.println(yytext());return new Symbol(Simbolo.id,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "tipo" {System.out.println(yytext());return new Symbol(Simbolo.tipo,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "color" {System.out.println(yytext());return new Symbol(Simbolo.color,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "accioninicial" {System.out.println(yytext());return new Symbol(Simbolo.accioninicial,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "accionfinal" {System.out.println(yytext());return new Symbol(Simbolo.accionfinal,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "x" {System.out.println(yytext());return new Symbol(Simbolo.x,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "y" {System.out.println(yytext());return new Symbol(Simbolo.y,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "alto" {System.out.println(yytext());return new Symbol(Simbolo.alto,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "ancho" {System.out.println(yytext());return new Symbol(Simbolo.ancho,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "borde" {System.out.println(yytext());return new Symbol(Simbolo.borde,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "fuente" {System.out.println(yytext());return new Symbol(Simbolo.fuente,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "tam" {System.out.println(yytext());return new Symbol(Simbolo.tam,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "negrita" {System.out.println(yytext());return new Symbol(Simbolo.negrita,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "cursiva" {System.out.println(yytext());return new Symbol(Simbolo.cursiva,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "nombre" {System.out.println(yytext());return new Symbol(Simbolo.nombre,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "maximo" {System.out.println(yytext());return new Symbol(Simbolo.maximo,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "minimo" {System.out.println(yytext());return new Symbol(Simbolo.minimo,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "accion" {System.out.println(yytext());return new Symbol(Simbolo.accion,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "referencia" {System.out.println(yytext());return new Symbol(Simbolo.referencia,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "path" {System.out.println(yytext());return new Symbol(Simbolo.path,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "auto-reproduccion" {System.out.println(yytext());return new Symbol(Simbolo.reproduccion,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> {numero} {System.out.println(yytext()); return new Symbol(Simbolo.numero,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> {Cadena} {String cadenasincomillas=yytext();
+                        cadenasincomillas = cadenasincomillas.substring(1,cadenasincomillas.length()-1);
+                        System.out.println(cadenasincomillas);
+                         return new Symbol(Simbolo.Cadena, yyline,yychar,cadenasincomillas);}
+<VERIFICACIONETIQUETA> "verdadero" {System.out.println(yytext());return new Symbol(Simbolo.verdadero,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> "falso" {System.out.println(yytext());return new Symbol(Simbolo.falso,yyline,yychar, yytext());} 
+<VERIFICACIONETIQUETA> [\n] {yychar=1;}
+<VERIFICACIONETIQUETA> {Caracteres_no_importantes} { }
+<VERIFICACIONETIQUETA>{Llamada} {String cadenasincomillas=yytext();
+                        cadenasincomillas = cadenasincomillas.substring(1,cadenasincomillas.length()-1);
+                        System.out.println(cadenasincomillas);
+                         return new Symbol(Simbolo.llamadametodo, yyline,yychar,cadenasincomillas);}
+
+<TEXTOVERIFICACION> "##"   {yybegin(COMENTARIOSIMPLE1);}
+<TEXTOVERIFICACION> "#$"   {yybegin(COMENTARIOMULTILINEA1);}
+<TEXTOVERIFICACION> {Caracteres_no_importantes} { texto_auxiliar+=yytext(); }
+<TEXTOVERIFICACION> [^<]   { texto_auxiliar+=yytext(); }
+<TEXTOVERIFICACION> "<"    {yybegin(POSIBLETEXTO);}
+
+<POSIBLETEXTO> "texto" {yybegin(TEXTOENCAPSULADO);System.out.println(yytext());return new Symbol(Simbolo.texto,yyline,yychar, yytext());}
+<POSIBLETEXTO> {Caracteres_no_importantes} {}
+<POSIBLETEXTO> {Comentario} {System.out.println(yytext());}
+<POSIBLETEXTO> "/boton" {yybegin(YYINITIAL);System.out.println("SALIDA"+texto_auxiliar+"AQUI TERMINA"); return new Symbol(Simbolo.textoentrelineas,yyline,yychar, texto_auxiliar);}
+<POSIBLETEXTO> "/enviar" {yybegin(YYINITIAL);System.out.println("SALIDA"+texto_auxiliar+"AQUI TERMINA"); return new Symbol(Simbolo.textoentrelineas,yyline,yychar, texto_auxiliar);}
+
+
+<COMENTARIOSIMPLE1> {caracternormal} {}
+<COMENTARIOSIMPLE1> {finlinea} {yybegin(TEXTOVERIFICACION);}
+
+
+<COMENTARIOMULTILINEA1> {Contenido} {yybegin(TEXTOVERIFICACION);}
+<COMENTARIOMULTILINEA1> [^#] {}
+
+<TEXTOENCAPSULADO> {Comentario} {System.out.println(yytext());}
+
+<TEXTOENCAPSULADO> ">" {texto_auxiliar= new String();yybegin(TEXTOFINAL);System.out.println(yytext());return new Symbol(Simbolo.cerrar,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "=" {System.out.println(yytext());return new Symbol(Simbolo.igual,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "id" {System.out.println(yytext());return new Symbol(Simbolo.id,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "tipo" {System.out.println(yytext());return new Symbol(Simbolo.tipo,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "color" {System.out.println(yytext());return new Symbol(Simbolo.color,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "accioninicial" {System.out.println(yytext());return new Symbol(Simbolo.accioninicial,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "accionfinal" {System.out.println(yytext());return new Symbol(Simbolo.accionfinal,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "x" {System.out.println(yytext());return new Symbol(Simbolo.x,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "y" {System.out.println(yytext());return new Symbol(Simbolo.y,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "alto" {System.out.println(yytext());return new Symbol(Simbolo.alto,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "ancho" {System.out.println(yytext());return new Symbol(Simbolo.ancho,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "borde" {System.out.println(yytext());return new Symbol(Simbolo.borde,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "fuente" {System.out.println(yytext());return new Symbol(Simbolo.fuente,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "tam" {System.out.println(yytext());return new Symbol(Simbolo.tam,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "negrita" {System.out.println(yytext());return new Symbol(Simbolo.negrita,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "cursiva" {System.out.println(yytext());return new Symbol(Simbolo.cursiva,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "nombre" {System.out.println(yytext());return new Symbol(Simbolo.nombre,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "maximo" {System.out.println(yytext());return new Symbol(Simbolo.maximo,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "minimo" {System.out.println(yytext());return new Symbol(Simbolo.minimo,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "accion" {System.out.println(yytext());return new Symbol(Simbolo.accion,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "referencia" {System.out.println(yytext());return new Symbol(Simbolo.referencia,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "path" {System.out.println(yytext());return new Symbol(Simbolo.path,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "auto-reproduccion" {System.out.println(yytext());return new Symbol(Simbolo.reproduccion,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> {numero} {System.out.println(yytext()); return new Symbol(Simbolo.numero,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> {Cadena} {String cadenasincomillas=yytext();
+                        cadenasincomillas = cadenasincomillas.substring(1,cadenasincomillas.length()-1);
+                        System.out.println(cadenasincomillas);
+                         return new Symbol(Simbolo.Cadena, yyline,yychar,cadenasincomillas);}
+<TEXTOENCAPSULADO> "verdadero" {System.out.println(yytext());return new Symbol(Simbolo.verdadero,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> "falso" {System.out.println(yytext());return new Symbol(Simbolo.falso,yyline,yychar, yytext());} 
+<TEXTOENCAPSULADO> [\n] {yychar=1;}
+<TEXTOENCAPSULADO> {Caracteres_no_importantes} { }
+<TEXTOENCAPSULADO>{Llamada} {String cadenasincomillas=yytext();
+                        cadenasincomillas = cadenasincomillas.substring(1,cadenasincomillas.length()-1);
+                        System.out.println(cadenasincomillas);
+                         return new Symbol(Simbolo.llamadametodo, yyline,yychar,cadenasincomillas);}
+
+<TEXTOFINAL> "##"   {yybegin(COMENTARIOSIMPLE2);}
+<TEXTOFINAL> "#$"   {yybegin(COMENTARIOMULTILINEA2);}
+<TEXTOFINAL> {Caracteres_no_importantes} { texto_auxiliar+=yytext(); }
+<TEXTOFINAL> [^<]   { texto_auxiliar+=yytext(); }
+<TEXTOFINAL> "<"    {yybegin(YYINITIAL);System.out.println("SALIDA"+texto_auxiliar+"AQUI TERMINA"); return new Symbol(Simbolo.textoentrelineas,yyline,yychar, texto_auxiliar);}
+
+
+
+<COMENTARIOSIMPLE2> {caracternormal} {}
+<COMENTARIOSIMPLE2> {finlinea} {yybegin(TEXTOENCAPSULADO);}
+
+
+<COMENTARIOMULTILINEA2> {Contenido} {yybegin(TEXTOENCAPSULADO);}
+<COMENTARIOMULTILINEA2> [^#] {}
+
+
+<YYINITIAL>. {
+    System.err.println("Este es un error lexico: "+yytext()+", en la linea: "+yyline+", en la columna: "+yychar);
+}
+. {
+    System.err.println("Este es un error lexico: "+yytext()+", en la linea: "+yyline+", en la columna: "+yychar);
+}

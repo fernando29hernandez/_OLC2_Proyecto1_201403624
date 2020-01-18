@@ -1,0 +1,372 @@
+package Analizadores; 
+
+
+import java.util.LinkedList;
+import java_cup.runtime.*;
+import Arbol.Entorno.*;
+import Arbol.Expresiones.*;
+import Arbol.Instrucciones.*;
+import Arbol.Expresiones.Arimeticas.*;
+import Arbol.Expresiones.Logicas.*;
+import Arbol.Expresiones.Relacionales.*;
+import Arbol.Instrucciones.Condicional.*;
+import Arbol.Instrucciones.General.*;
+import Arbol.Instrucciones.Iterativa.*;
+import Arbol.*;
+import Arbol.Instrucciones.GUI.*;
+
+parser code 
+{:   
+
+    public Arbol_R AST;
+    public void syntax_error(Symbol s){ 
+            Errores.agregar_error("Error de Orden de sentencia: "+s.value,s.left, s.right,"Sintactico");
+            System.err.println("Error Sintactico en la Linea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
+    } 
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+            System.err.println("Error sintactico irrecuperable en la Linea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido."); 
+    }  
+:} 
+
+terminal String entero,decimal,cadena,falso,verdadero,caracter,importar,imprimir,vacio,nulo;
+terminal String si,sino,ciclofor,mientras,hacermientras,seleccion,caso,defecto,romper,siga,definir;
+terminal String fusion,regresar,cuando,pesode,reservar,atexto,concatenar,aentero,adecimal,compequals;
+terminal String abrir,escribir,cerrar,buscar_abrir,leer,etiqueta,cajatexto,cajaareatexto,contrasena,cajanumero,mostrar_ventana;
+terminal String boton,mensaje,cadenaR,principal;
+
+terminal String tipoentero,tipodecimal,tipoboleano,tipocaracter;
+terminal String iniciar,click,agregar_componente,tamform,settexto,setalto,setancho,setpos,gettexto,getancho,getalto,getpos;
+terminal String igual,abrirllave,cerrarllave,abrirparentesis,cerrarparentesis,abrircorchete,cerrarcorchete;
+terminal String mas,menos,por,div,potencia,modulo,masplus,menosplus,sumalogica,multiplicacionlogica,notlogico;
+terminal String punto,mayor,menor,mayorigual,menorigual,igualigual,diferente,coma,puntocoma,dospuntos,numeral;
+terminal String identificador;
+terminal String Umenos;
+terminal String Upor;
+
+non terminal Instruccion INICIO;
+non terminal LinkedList<Instruccion> Instrucciones;
+non terminal Instruccion instruccion;
+non terminal Tipo tipo;
+non terminal LinkedList<Instruccion> parametros;
+non terminal Instruccion SentenciaDecFuncion;
+non terminal String evento;
+non terminal Expresion E;
+non terminal Instruccion SentenciaDeclaracion;
+non terminal Instruccion SentenciaImpresion;
+non terminal Instruccion SentenciaAsignacion;
+non terminal Instruccion SentenciaSI;
+non terminal Instruccion SentenciaSeleccion;
+non terminal Instruccion SentenciaFor;
+non terminal Instruccion SentenciaMientras;
+non terminal Instruccion SentenciaRepeat;
+non terminal Instruccion SentenciaCaso;
+non terminal Instruccion SentenciaRetorno;
+non terminal Instruccion SentenciaDetener;
+non terminal Instruccion SentenciaDefinir;
+non terminal Instruccion SentenciaImportar;
+non terminal Instruccion SentenciaContinuar;
+non terminal Instruccion SentenciaFUSION;
+non terminal LinkedList<Instruccion> Declaraciones;
+non terminal LinkedList<Instruccion> Listacasos;
+non terminal Instruccion Inicializacion;
+non terminal LinkedList<Expresion> ListaExpresiones;
+non terminal Dimensiones;
+non terminal LinkedList<Expresion> DimensionesExplicitas;
+non terminal LinkedList<Expresion> Exps;
+non terminal Expresion ListaAccesos,Acceso,Llamada,llamada_a_nativas;
+non terminal LinkedList<Instruccion> BloqueSentencias;
+non terminal Instruccion SentenciaMostrar_Ventana;
+non terminal Expresion INSTANCIAARREGLO;
+non terminal Instruccion SentenciaAbrir;
+non terminal Instruccion SentenciaBuscar;
+non terminal Instruccion SentenciaEscribir;
+non terminal Instruccion SentenciaCerrar;
+non terminal Instruccion SentenciaLeer;
+non terminal Instruccion AUMENTO;
+non terminal Instruccion SentenciaMensaje;
+
+non terminal LinkedList<Expresion> LISTAINSTANCIA;
+
+precedence right igual;
+precedence right dospuntos;
+precedence left sumalogica;
+precedence left multiplicacionlogica;
+precedence right notlogico;
+
+precedence left menor,menorigual,mayor,mayorigual,igualigual,diferente;
+
+precedence left mas,menos;
+precedence left por,div,modulo;
+precedence left potencia;
+precedence left punto;
+
+precedence left Umenos,Upor;
+
+start with INICIO; 
+
+
+INICIO ::= Instrucciones:a{:AST=new Arbol_R(a);:}
+;
+
+Instrucciones ::= Instrucciones:a instruccion:b {:RESULT=a;RESULT.add(b);:}
+                  |instruccion:a                {:RESULT=new LinkedList<>(); RESULT.add(a);:}
+;
+
+instruccion ::=  SentenciaDeclaracion:a puntocoma    {:RESULT=a;:}
+                |SentenciaAsignacion:a    puntocoma{:RESULT=a;:}
+                |ListaAccesos:a puntocoma{:RESULT=new INSACCESO(a);:}
+                |SentenciaImpresion:a       {:RESULT=a;:}                
+                |SentenciaRetorno:a         {:RESULT=a;:}
+                |SentenciaDetener:a         {:RESULT=a;:}
+                |SentenciaContinuar:a       {:RESULT=a;:}
+                |SentenciaDecFuncion:a      {:RESULT=a;:}
+                |SentenciaImportar:a        {:RESULT=a;:}
+                |SentenciaDefinir:a         {:RESULT=a;:}
+                |SentenciaSI:a              {:RESULT=a;:}
+                |SentenciaSeleccion:a       {:RESULT=a;:}
+                |SentenciaFor:a             {:RESULT=a;:}
+                |SentenciaMientras:a        {:RESULT=a;:}
+                |SentenciaRepeat:a          {:RESULT=a;:}
+                |SentenciaFUSION:a          {:RESULT=a;:}
+                |SentenciaAbrir:a           {:RESULT=a;:}
+                |SentenciaBuscar:a          {:RESULT=a;:}
+                |SentenciaEscribir:a        {:RESULT=a;:}
+                |SentenciaCerrar:a          {:RESULT=a;:}
+                |SentenciaLeer:a            {:RESULT=a;:}
+                |SentenciaMostrar_Ventana:a {:RESULT=a;:}
+                |SentenciaMensaje:a         {:RESULT=a;:}
+                |agregar_componente:a Exps:b puntocoma{:RESULT =  new INSTANCIAR_COMPONENTE("agregar_componente",b,aleft,aright);:}
+;
+/***
+*CAMBIAR A EXPS TODO LO QUE RECIBBA PARAMETROS
+*
+*/
+SentenciaMensaje ::= mensaje:a Exps:b puntocoma                      {:Tipo t = new Tipo(Tipo.TipoSimbolo.componente,Tipo.TipoComponente.mensaje);
+                                                                       RESULT = new MENSAJE(t,b,aleft,aright);
+                                                                      :};
+SentenciaMostrar_Ventana ::= mostrar_ventana:a abrirparentesis E:b cerrarparentesis puntocoma{:RESULT = new MOSTRAR_VENTANA(b,aleft,aright);:}
+;
+SentenciaImportar ::= numeral:a importar E:b                          {:RESULT = new IMPORTAR(b,aleft,aright);:} 
+;
+SentenciaDefinir ::= numeral:a definir identificador:b E:c            {:RESULT = new CONSTANTE(b,c,aleft,aright);:}
+;
+SentenciaAbrir  ::= abrir:a Exps:b puntocoma                          {:RESULT = new ABRIR(b,aleft,aright);:}
+;
+
+SentenciaBuscar  ::= buscar_abrir:a Exps:b puntocoma                  {:RESULT = new BUSCAR_ABRIR(b,aleft,aright);:}
+;
+SentenciaEscribir ::= escribir:b Exps:a puntocoma                     {:RESULT = new ESCRIBIR(a,bleft,bright);:}
+;
+SentenciaCerrar::= cerrar:a abrirparentesis cerrarparentesis puntocoma{:RESULT = new CERRAR(aleft,aright);:}
+;
+SentenciaLeer::= leer:a Exps:b puntocoma                              {:RESULT = new LEER(b,aleft,aright);:}
+;
+SentenciaFUSION::= fusion:a identificador:b abrirllave Declaraciones:c cerrarllave puntocoma {:RESULT = new FUSION(b,c,aleft,aright);:}
+
+;
+Declaraciones ::= Declaraciones:a SentenciaDeclaracion:b   puntocoma {:RESULT= a; RESULT.add(b);:}
+                 |SentenciaDeclaracion:a     puntocoma               {:RESULT = new LinkedList<>(); RESULT.add(a);:}
+;
+
+
+
+tipo ::=  tipoentero:a      {:RESULT = new Tipo(Tipo.TipoSimbolo.entero); :}
+          |tipocaracter:a   {:RESULT = new Tipo(Tipo.TipoSimbolo.caracter); :}
+          |tipodecimal:a    {:RESULT = new Tipo(Tipo.TipoSimbolo.doble); :}
+          |tipoboleano:a    {:RESULT = new Tipo(Tipo.TipoSimbolo.booleano); :}
+          //|identificador:a  {:RESULT = new Tipo(Tipo.TipoSimbolo.objeto,a); :}
+/**
+*Al que vea esta gramamtica la razon por la cual no se mete el ID aca es porque
+ CUP no sabe que hacer despues con la produccion de accesos y esta produccion ya que las dos 
+son parecidas en por eso esta comentada, no deveria ser asi pero CUP no soporta esto como IRONY
+**/
+          |etiqueta:a       {:RESULT = new Tipo(Tipo.TipoSimbolo.componente,Tipo.TipoComponente.et); :}
+          |cajatexto:a      {:RESULT = new Tipo(Tipo.TipoSimbolo.componente,Tipo.TipoComponente.caja); :}
+          |cajaareatexto:a  {:RESULT = new Tipo(Tipo.TipoSimbolo.componente,Tipo.TipoComponente.cajaarea); :}
+          |cajanumero:a     {:RESULT = new Tipo(Tipo.TipoSimbolo.componente,Tipo.TipoComponente.cajanum); :}
+          |contrasena:a     {:RESULT = new Tipo(Tipo.TipoSimbolo.componente,Tipo.TipoComponente.cajapass); :}
+          |cadenaR:a        {:RESULT = new Tipo(Tipo.TipoSimbolo.componente,Tipo.TipoComponente.rstring); :}
+          |boton:a          {:RESULT = new Tipo(Tipo.TipoSimbolo.componente,Tipo.TipoComponente.boton); :}
+          |vacio:a          {:RESULT = new Tipo(Tipo.TipoSimbolo.vacio); :}
+;
+
+BloqueSentencias ::=    abrirllave Instrucciones:a cerrarllave {: RESULT =a; :}
+                       |abrirllave cerrarllave                 {: RESULT = new LinkedList<>(); :}
+;
+SentenciaDecFuncion ::= tipo:t identificador:a abrirparentesis parametros:b cerrarparentesis BloqueSentencias:c              {:RESULT = new FUNCION(t,a,b,c,null,aleft,aright);:}
+               |tipo:t identificador:a abrirparentesis  cerrarparentesis BloqueSentencias:c                                  {:RESULT = new FUNCION(t,a,null,c,null,aleft,aright);:}
+               |tipo:t identificador:a dospuntos evento:d  abrirparentesis cerrarparentesis BloqueSentencias:c               {:RESULT = new FUNCION(t,a,null,c,d,aleft,aright);:}
+               |tipo:t identificador:a dospuntos evento:d  abrirparentesis parametros:b cerrarparentesis BloqueSentencias:c  {:RESULT = new FUNCION(t,a,b,c,d,aleft,aright);:}
+               |tipo:t Dimensiones:dim identificador:a abrirparentesis parametros:b cerrarparentesis BloqueSentencias:c      {:RESULT = new FUNCION(t,a,b,c,null,Integer.parseInt(dim.toString()),aleft,aright);:}
+               |tipo:t Dimensiones:dim identificador:a abrirparentesis  cerrarparentesis BloqueSentencias:c                     {:RESULT = new FUNCION(t,a,null,c,null,Integer.parseInt(dim.toString()),aleft,aright);:}
+               |tipo:t Dimensiones:dim identificador:a dospuntos evento:d  abrirparentesis cerrarparentesis BloqueSentencias:c  {:RESULT = new FUNCION(t,a,null,c,d,Integer.parseInt(dim.toString()),aleft,aright);:}
+               |identificador:t identificador:a abrirparentesis parametros:b cerrarparentesis BloqueSentencias:c             {:Tipo tipo=new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT = new FUNCION(tipo,a,b,c,null,aleft,aright);:}
+               |identificador:t identificador:a abrirparentesis  cerrarparentesis BloqueSentencias:c                         {:Tipo tipo=new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT = new FUNCION(tipo,a,null,c,null,aleft,aright);:}
+               |identificador:t identificador:a dospuntos evento:d  abrirparentesis cerrarparentesis BloqueSentencias:c      {:Tipo tipo=new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT = new FUNCION(tipo,a,null,c,d,aleft,aright);:}
+               |identificador:t Dimensiones:dim identificador:a abrirparentesis parametros:b cerrarparentesis BloqueSentencias:c {:Tipo tipo=new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT = new FUNCION(tipo,a,b,c,null,Integer.parseInt(dim.toString()),aleft,aright);:}
+               |identificador:t Dimensiones:dim identificador:a abrirparentesis  cerrarparentesis BloqueSentencias:c                     {:Tipo tipo=new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT = new FUNCION(tipo,a,null,c,null,Integer.parseInt(dim.toString()),aleft,aright);:}
+               |identificador:t Dimensiones:dim identificador:a dospuntos evento:d  abrirparentesis cerrarparentesis BloqueSentencias:c  {:Tipo tipo=new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT = new FUNCION(tipo,a,null,c,d,Integer.parseInt(dim.toString()),aleft,aright);:}
+                
+               |tipo:t principal:a abrirparentesis cerrarparentesis BloqueSentencias:c                                       {:RESULT = new FUNCION(t,a,null,c,null,aleft,aright);:}
+;
+
+evento ::= iniciar:a {:RESULT = a;:}
+           |click:a  {:RESULT = a;:}
+;
+parametros ::= parametros:a coma SentenciaDeclaracion:b {:RESULT=a; RESULT.add(b);:}
+               |SentenciaDeclaracion:a                  {:RESULT = new LinkedList<>(); RESULT.add(a);:}
+
+;
+
+SentenciaRetorno ::= regresar:r E:a puntocoma  {:RESULT = new RETORNAR(a,rleft,rright);:}
+                    |regresar:r puntocoma      {:RESULT = new RETORNAR(null,rleft,rright);:}
+;
+SentenciaDetener ::= romper:a puntocoma {:RESULT = new DETENER(aleft,aright);:}
+;
+SentenciaContinuar ::= siga:a puntocoma {:RESULT = new CONTINUAR(aleft,aright);:}
+;
+
+SentenciaSeleccion::= seleccion:a  abrirparentesis  E:b cerrarparentesis abrirllave Listacasos:c cerrarllave {:RESULT = new SELECCIONA(b,c,aleft,aright);:}
+;
+
+Listacasos ::= Listacasos:a SentenciaCaso:b            {:RESULT=a;RESULT.add(b);:}
+            |SentenciaCaso:a                           {:RESULT=new LinkedList(); RESULT.add(a);:}
+;
+SentenciaCaso ::= caso:a E:b dospuntos Instrucciones:c {:RESULT = new CASO(b,c,false,aleft,aright);:}
+                 |defecto:a dospuntos Instrucciones:c  {:RESULT = new CASO(null,c,true,aleft,aright);:}
+                ;
+
+SentenciaSI ::=  si:a abrirparentesis E:b cerrarparentesis BloqueSentencias:c                                {:RESULT = new SI(b,c,aleft,aright);:}
+                |si:a abrirparentesis E:b cerrarparentesis BloqueSentencias:c sino    SentenciaSI:d          {:RESULT = new SI(b,c,d,false,aleft,aright);:}
+                |si:a abrirparentesis E:b cerrarparentesis BloqueSentencias:c sino:e BloqueSentencias:d      {:SI sino = new SI(new PRIMITIVO(new Tipo(Tipo.TipoSimbolo.booleano),true,eleft,eright),d,null,true,eleft,eright);RESULT = new SI(b,c,sino,false,aleft,aright);:}
+
+;
+SentenciaMientras::= mientras:a abrirparentesis E:b cerrarparentesis BloqueSentencias:c                      {:RESULT = new WHILE(b,c,aleft,aright);:}
+;
+
+SentenciaRepeat ::= hacermientras:a  BloqueSentencias:b cuando abrirparentesis E:c cerrarparentesis puntocoma{:RESULT=new REPEAT(c,b,aleft,aright);:}
+;
+
+SentenciaFor::= ciclofor:a  abrirparentesis  Inicializacion:b puntocoma E:c puntocoma AUMENTO:d  cerrarparentesis BloqueSentencias:e{:RESULT=new FOR(b,c,d,e,aleft,aright);:}
+;
+
+Inicializacion::=   SentenciaDeclaracion:a  {:RESULT = a;:}
+                | SentenciaAsignacion:a  {:RESULT=a;:}
+;
+
+AUMENTO::= SentenciaAsignacion:a{:RESULT = a;:}
+            |ListaAccesos:a {:RESULT=new INSACCESO(a);:}
+;
+
+SentenciaImpresion ::= imprimir:b abrirparentesis ListaExpresiones:a cerrarparentesis puntocoma{:RESULT = new IMPRIMIR(a,bleft,bright);:}
+;
+
+ListaExpresiones ::= ListaExpresiones:a coma E:b  {:RESULT=a; RESULT.add(b);:}
+                    |E:a                          {:RESULT=new LinkedList(); RESULT.add(a);:}
+;
+                                                                                                /* Tipo,String,Expresion,int,int*/
+SentenciaDeclaracion ::= tipo:t identificador:a                                        {:RESULT=new DECLARACION(t,a,null,aleft,aright);:}
+                        |tipo:t identificador:a igual E:b                              {:RESULT=new DECLARACION(t,a,b,aleft,aright);:}
+                                                                                                /* Tipo,String,Expresion,int,int,int*/                        
+                        |tipo:t identificador:a Dimensiones:b                          {:RESULT=new DECLARACION_ARREGLO(t,a,null,Integer.parseInt(b.toString()),aleft,aright,true);:}
+                        |tipo:t identificador:a Dimensiones:b igual E:c                {:RESULT=new DECLARACION_ARREGLO(t,a,c,Integer.parseInt(b.toString()),aleft,aright,true);:}
+                                                                                                /* Tipo,String,Expresion,LinkedList<Expresion>,int,int*/
+                        |tipo:t identificador:a DimensionesExplicitas:b                {:RESULT=new DECLARACION_ARREGLO(t,a,null,b,aleft,aright);:}
+                        |tipo:t identificador:a DimensionesExplicitas:b igual E:c      {:RESULT=new DECLARACION_ARREGLO(t,a,c,b,aleft,aright);:}
+                        |identificador:t identificador:a                                        {:Tipo tipo= new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT=new DECLARACION(tipo,a,null,aleft,aright);:}
+                        |identificador:t identificador:a igual E:b                              {:Tipo tipo= new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT=new DECLARACION(tipo,a,b,aleft,aright);:}
+                                                                                                /* Tipo,String,Expresion,int,int,int*/                        
+                        |identificador:t identificador:a Dimensiones:b                          {:Tipo tipo= new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT=new DECLARACION_ARREGLO(tipo,a,null,Integer.parseInt(b.toString()),aleft,aright,true);:}
+                        |identificador:t identificador:a Dimensiones:b igual E:c                {:Tipo tipo= new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT=new DECLARACION_ARREGLO(tipo,a,c,Integer.parseInt(b.toString()),aleft,aright,true);:}
+                                                                                                /* Tipo,String,Expresion,LinkedList<Expresion>,int,int*/
+                        |identificador:t identificador:a DimensionesExplicitas:b                {:Tipo tipo= new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT=new DECLARACION_ARREGLO(tipo,a,null,b,aleft,aright);:}
+                        |identificador:t identificador:a DimensionesExplicitas:b igual E:c      {:Tipo tipo= new Tipo(Tipo.TipoSimbolo.objeto,t);RESULT=new DECLARACION_ARREGLO(tipo,a,c,b,aleft,aright);:}
+    
+;
+
+
+Dimensiones ::= Dimensiones:a abrircorchete cerrarcorchete        {:RESULT = Integer.parseInt(a.toString()) + 1;:}
+                |abrircorchete cerrarcorchete                     {:RESULT = 1;:} 
+;
+DimensionesExplicitas ::= DimensionesExplicitas:a abrircorchete E:b cerrarcorchete {: RESULT = a; RESULT.add(b); :}
+                        | abrircorchete E:a cerrarcorchete                         {: RESULT = new LinkedList<>(); RESULT.add(a); :}
+;
+SentenciaAsignacion ::= ListaAccesos:a igual:op E:b {: RESULT = new ASIGNACION(a,b,opleft,opright); :}
+;
+
+ListaAccesos ::= ListaAccesos:a punto:op Acceso:b {: RESULT = new ACCESO(a,b,opleft,opright); :}
+               | Acceso:a                         {: RESULT = a; :}
+;
+
+Acceso ::=   identificador:a                              {: RESULT = new ID(a,aleft,aright); :}
+           | Llamada:a                                    {: RESULT = a; :}
+           | identificador:a DimensionesExplicitas:b      {: RESULT = new ACCESOARREGLO(a,b,aleft,aright); :}
+           | identificador:a masplus                      {: RESULT = new POSFIJO(a,"++",aleft,aright); :}
+           | identificador:a menosplus                    {: RESULT = new POSFIJO(a,"--",aleft,aright); :}
+;
+Llamada ::=             identificador:a abrirparentesis cerrarparentesis                     {:RESULT=new LLAMADA_FUNCION(a,null,aleft,aright);:}        
+                       |identificador:a abrirparentesis  ListaExpresiones:b  cerrarparentesis{:RESULT=new LLAMADA_FUNCION(a,b,aleft,aright);:}
+                       |llamada_a_nativas:a                                                  {:RESULT= a;:}
+;
+
+
+Exps ::= abrirparentesis ListaExpresiones:a cerrarparentesis      {: RESULT = a; :}
+            | abrirparentesis  cerrarparentesis                   {: RESULT = new LinkedList<>(); :}
+;
+llamada_a_nativas ::= pesode:a Exps:b              {:RESULT =  new FUNCION_NATIVA("pesode",b,aleft,aright);:}
+                      |reservar:a Exps:b           {:RESULT =  new FUNCION_NATIVA("reservar",b,aleft,aright);:}
+                      |atexto:a Exps:b             {:RESULT =  new FUNCION_NATIVA("atexto",b,aleft,aright);:}
+                      |concatenar:a Exps:b         {:RESULT =  new FUNCION_NATIVA("concatenar",b,aleft,aright);:}
+                      |aentero:a Exps:b            {:RESULT =  new FUNCION_NATIVA("aentero",b,aleft,aright);:}
+                      |adecimal:a Exps:b           {:RESULT =  new FUNCION_NATIVA("adecimal",b,aleft,aright);:}
+                      |compequals:a Exps:b         {:RESULT =  new FUNCION_NATIVA("compequals",b,aleft,aright);:}
+                      |tamform:a Exps:b            {:RESULT =  new FUNCION_NATIVA("tamform",b,aleft,aright);:}
+                      |settexto:a Exps:b           {:RESULT =  new FUNCION_NATIVA("settexto",b,aleft,aright);:}
+                      |setalto:a Exps:b            {:RESULT =  new FUNCION_NATIVA("setalto",b,aleft,aright);:}
+                      |setancho:a Exps:b           {:RESULT =  new FUNCION_NATIVA("setancho",b,aleft,aright);:}
+                      |setpos:a Exps:b             {:RESULT =  new FUNCION_NATIVA("setpos",b,aleft,aright);:}
+                      |gettexto:a Exps:b           {:RESULT =  new FUNCION_NATIVA("gettexto",b,aleft,aright);:}
+                      |getancho:a Exps:b           {:RESULT =  new FUNCION_NATIVA("getancho",b,aleft,aright);:}
+                      |getalto:a Exps:b            {:RESULT =  new FUNCION_NATIVA("getalto",b,aleft,aright);:}
+                      |getpos:a Exps:b             {:RESULT =  new FUNCION_NATIVA("getpos",b,aleft,aright);:}
+;
+
+
+E ::=        E:a sumalogica:op E:b                                  {:RESULT= new OR(a,b,"||",opleft,opright);:}
+            |E:a multiplicacionlogica:op E:b                        {:RESULT= new AND(a,b,"&&",opleft,opright);:}
+            |notlogico:op      E:a                                  {:RESULT= new NOT(a,"!",opleft,opright);:}
+            |E:a menor:op      E:b                                  {:RESULT= new MENOR(a,b,"<",opleft,opright);:}
+            |E:a mayor:op      E:b                                  {:RESULT= new MAYOR(a,b,">",opleft,opright);:}
+            |E:a menorigual:op E:b                                  {:RESULT= new MENORIGUAL(a,b,"<=",opleft,opright);:}
+            |E:a mayorigual:op E:b                                  {:RESULT= new MAYORIGUAL(a,b,">=",opleft,opright);:}
+            |E:a igualigual:op E:b                                  {:RESULT= new IGUALIGUAL(a,b,"==",opleft,opright);:}
+            |E:a diferente:op  E:b                                  {:RESULT= new DIFERENTE(a,b,"<>",opleft,opright);:}
+            |E:a mas:op        E:b                                  {:RESULT= new SUMA(a,b,"+",opleft,opright);:}
+            |E:a menos:op      E:b                                  {:RESULT= new RESTA(a,b,"-",opleft,opright);:}
+            |E:a por:op        E:b                                  {:RESULT= new MUL(a,b,"*",opleft,opright);:}
+            |E:a div:op        E:b                                  {:RESULT= new DIV(a,b,"/",opleft,opright);:}
+            |E:a potencia:op   E:b                                  {:RESULT= new POTENCIA(a,b,"^",opleft,opright);:}
+            |E:a modulo:op     E:b                                  {:RESULT= new MOD(a,b,"%",opleft,opright);:}
+            |abrirparentesis E:a cerrarparentesis                   {:RESULT= a;:}
+            |INSTANCIAARREGLO:a                                     {:RESULT= a;:}
+            |menos:op E:a                                           {:RESULT = new MENOSUNARIO("-",a,opleft,opright);:}%prec Umenos 
+            |por:op   E:a                                           {:RESULT = new REFERENCIA("*",a,opleft,opright);:}%prec Upor 
+            |ListaAccesos:a                                         {:RESULT = a;:}
+            |entero:a                                               {:RESULT = new PRIMITIVO(new Tipo(Tipo.TipoSimbolo.entero),a,aleft,aright);:}
+            |decimal:a                                              {:RESULT = new PRIMITIVO(new Tipo(Tipo.TipoSimbolo.doble),a,aleft,aright);:}
+            |caracter: a                                            {:RESULT = new PRIMITIVO(new Tipo(Tipo.TipoSimbolo.caracter),a,aleft,aright);:}
+            |cadena: a                                              {:RESULT = new CADENA(new Tipo(Tipo.TipoSimbolo.cadena),a,aleft,aright);:}
+            |falso:a                                                {:RESULT = new PRIMITIVO(new Tipo(Tipo.TipoSimbolo.booleano),a,aleft,aright);:}
+            |verdadero:a                                            {:RESULT = new PRIMITIVO(new Tipo(Tipo.TipoSimbolo.booleano),a,aleft,aright);:}
+            |nulo:a                                                 {:RESULT = new PRIMITIVO(new Tipo(Tipo.TipoSimbolo.nulo),null,aleft,aright);:}
+;
+
+
+INSTANCIAARREGLO ::= abrirllave:a LISTAINSTANCIA:b cerrarllave                  {:RESULT= new INSTANCIA_ARREGLO(b,aleft,aright);:}
+                    |abrirllave:a cerrarllave                                   {:RESULT= new INSTANCIA_ARREGLO(null,aleft,aright);:}
+;
+LISTAINSTANCIA ::= LISTAINSTANCIA:a coma E:b {:RESULT = a; RESULT.add(b);:}
+                   |E:a {:RESULT = new LinkedList<>(); RESULT.add(a);:}
+;
+
+

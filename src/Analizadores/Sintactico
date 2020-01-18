@@ -1,0 +1,168 @@
+package analizadores; 
+
+
+import java.util.LinkedList;
+import java_cup.runtime.*;
+import ArbolAST.*;
+import ArbolAST.TipoAtributo.*;
+import java.util.Hashtable;
+parser code 
+{:   
+  public Arbol AST;
+    
+
+   
+    public void syntax_error(Symbol s){ 
+            System.err.println("Error Sintactico en la Linea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
+    } 
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+            System.err.println("Error sintactico irrecuperable en la Linea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido."); 
+    }  
+:} 
+
+terminal String numero,Cadena,falso,verdadero,igual,importar,importarc,llamadametodo;
+terminal String tipo,id,contenedor,contenedorc,ventana,ventanac,control,controlc;
+terminal String texto,textoc,textoentrelineas,listadatos,listadatosc,dato,datoc;
+terminal String defecto,defectoc,boton,botonc,enviar,enviarc,multimedia,multimediac;
+terminal String color,accioninicial,accionfinal,x,y,alto,ancho,borde;
+terminal String fuente,tam,negrita,cursiva,nombre,maximo,minimo,accion,referencia;
+terminal String path,reproduccion,abrir,cerrar;
+
+
+non terminal Nodo INICIO;
+non terminal LinkedList<Nodo> CUERPOGXML;
+non terminal Nodo SENTENCIAVENTANA,SENTENCIAIMPORTAR,SENTENCIAGENERAL;
+non terminal LinkedList<Contenedor> CONTENEDORES; 
+non terminal LinkedList<Nodo>  ELEMENTOSGUI;
+non terminal Contenedor SENTENCIACONTENEDOR;
+non terminal Nodo ELEMENTOGUI;
+non terminal Control SENTENCIACONTROL;
+non terminal Texto SENTENCIATEXTO;
+non terminal Defecto SENTENCIADEFECTO;
+non terminal Enviar SENTENCIAENVIAR;
+non terminal Multimedia SENTENCIAMULTIMEDIA;
+non terminal Boton SENTENCIABOTON;
+non terminal ListaDatos SENTENCIALISTADATOS;
+non terminal Dato SENTENCIADATO;
+non terminal LinkedList<Nodo> LISTADEOPCIONES;
+non terminal Hashtable<String,Nodo> DEFECTOOPCIONES;
+non terminal LinkedList<Parametro> LISTAPARAMETROS;
+non terminal Parametro PARAMETRO;
+non terminal String PROPIEDAD;
+non terminal Nodo ATRIBUTO;
+start with INICIO; 
+
+INICIO::=CUERPOGXML:a{:AST=new Arbol(a);:};
+
+CUERPOGXML ::= CUERPOGXML:a SENTENCIAGENERAL:b{:RESULT=a; RESULT.add(b);:}
+            |SENTENCIAGENERAL:a{:RESULT = new LinkedList();RESULT.add(a);:};
+
+SENTENCIAGENERAL ::= SENTENCIAIMPORTAR:a{:RESULT= a;:}
+                    |SENTENCIAVENTANA:a{:RESULT =a;:};
+
+SENTENCIAIMPORTAR ::= abrir importar LISTAPARAMETROS:a cerrar textoentrelineas:b importarc cerrar{:RESULT = new Importar(a,b);:}
+                    |abrir importar cerrar textoentrelineas:a importarc cerrar{:RESULT = new Importar(null,a);:};
+
+
+SENTENCIAVENTANA ::= abrir ventana LISTAPARAMETROS:a cerrar CONTENEDORES:b abrir ventanac cerrar{:RESULT = new  Ventana(a,b);:}
+                    |abrir ventana cerrar CONTENEDORES:a abrir ventanac cerrar{:RESULT = new Ventana(null,a);:}
+                    |abrir ventana LISTAPARAMETROS:a cerrar abrir ventanac cerrar{:RESULT = new Ventana(a,null);:}
+                    |abrir ventana cerrar abrir ventanac cerrar{:RESULT = new Ventana(null,null);:};
+
+CONTENEDORES ::= CONTENEDORES:a SENTENCIACONTENEDOR:b{:RESULT = a; RESULT.add(b);:}
+                |SENTENCIACONTENEDOR:a{:RESULT = new LinkedList();RESULT.add(a);:};
+
+SENTENCIACONTENEDOR ::=  abrir contenedor LISTAPARAMETROS:a cerrar ELEMENTOSGUI:b abrir contenedorc cerrar{:RESULT = new Contenedor(a,b);:}
+                        |abrir contenedor cerrar ELEMENTOSGUI:a abrir contenedorc cerrar{:RESULT = new Contenedor(null,a);:}
+                        |abrir contenedor LISTAPARAMETROS:a cerrar abrir contenedorc cerrar{:RESULT = new Contenedor(a,null);:}
+                        |abrir contenedor cerrar abrir contenedorc cerrar{:RESULT = new Contenedor(null,null);:};
+
+ELEMENTOSGUI ::= ELEMENTOSGUI:a ELEMENTOGUI:b{:RESULT =a; RESULT.add(b);:}
+                |ELEMENTOGUI:a{:RESULT = new LinkedList(); RESULT.add(a);:};
+
+ELEMENTOGUI ::= SENTENCIATEXTO:a{:RESULT = a;:}
+                |SENTENCIACONTROL:a{:RESULT = a;:}
+                |SENTENCIADEFECTO:a{:RESULT = a;:}
+                |SENTENCIAENVIAR:a{:RESULT = a;:}
+                |SENTENCIABOTON:a{:RESULT = a;:}
+                |SENTENCIAMULTIMEDIA:a{:RESULT = a;:};
+
+
+SENTENCIATEXTO ::= abrir texto LISTAPARAMETROS:a cerrar textoentrelineas:b textoc cerrar{:RESULT = new Texto(a,b);:}
+                  |abrir texto cerrar textoentrelineas:a textoc cerrar{:RESULT = new Texto(null,a);:};
+
+
+SENTENCIADEFECTO ::= abrir defecto LISTAPARAMETROS:a cerrar textoentrelineas:b defectoc cerrar{:RESULT = new Defecto(a,b);:}
+                  |abrir defecto cerrar textoentrelineas:a defectoc cerrar{:RESULT = new Defecto(null,a);:};
+
+SENTENCIABOTON ::= abrir boton LISTAPARAMETROS:a cerrar textoentrelineas:b cerrar{:RESULT = new Boton(a,null,b);:}
+                  |abrir boton LISTAPARAMETROS:a cerrar texto LISTAPARAMETROS:b cerrar textoentrelineas:c textoc cerrar abrir botonc cerrar{:RESULT = new Boton(a,b,c);:}
+                  |abrir boton LISTAPARAMETROS:a cerrar texto cerrar textoentrelineas:b textoc cerrar abrir botonc cerrar{:RESULT = new Boton(a,null,b);:}
+                  |abrir boton cerrar texto cerrar textoentrelineas:a textoc cerrar abrir botonc cerrar{:RESULT = new Boton(null,null,a);:}
+                  |abrir boton cerrar textoentrelineas  cerrar{:RESULT = new Boton(null,null,null);:};
+
+SENTENCIAENVIAR ::= abrir enviar LISTAPARAMETROS:a cerrar textoentrelineas:b cerrar{:RESULT = new Enviar(a,null,b);:}
+                  |abrir enviar LISTAPARAMETROS:a cerrar texto LISTAPARAMETROS:b cerrar textoentrelineas:c textoc cerrar abrir enviarc cerrar{:RESULT = new Enviar(a,b,c);:}
+                  |abrir enviar LISTAPARAMETROS:a cerrar texto cerrar textoentrelineas:b textoc cerrar abrir enviarc cerrar{:RESULT = new Enviar(a,null,b);:}
+                  |abrir enviar cerrar texto cerrar textoentrelineas:a textoc cerrar abrir enviarc cerrar{:RESULT = new Enviar(null,null,a);:}
+                  |abrir enviar cerrar textoentrelineas  cerrar{:RESULT = new Enviar(null,null,null);:};
+
+SENTENCIAMULTIMEDIA ::= abrir multimedia LISTAPARAMETROS:a cerrar abrir multimediac cerrar{:RESULT = new Multimedia(a);:}
+                        |abrir multimedia cerrar abrir multimediac cerrar{:RESULT = new Multimedia();:};
+
+
+SENTENCIACONTROL ::= abrir control LISTAPARAMETROS:a cerrar DEFECTOOPCIONES:b abrir controlc cerrar{:RESULT= new Control(a,b);:}
+                    |abrir control LISTAPARAMETROS:a cerrar abrir controlc cerrar{:RESULT= new Control(a,null);:}
+                    |abrir control cerrar DEFECTOOPCIONES:a abrir controlc cerrar{:RESULT= new Control(null,a);:};
+
+DEFECTOOPCIONES ::= DEFECTOOPCIONES:a SENTENCIALISTADATOS:b{:RESULT=a; RESULT.put("Lista",b);:}
+                    |DEFECTOOPCIONES:a SENTENCIADEFECTO:b{:RESULT=a;RESULT.put("Defecto",b);:}
+                    |SENTENCIALISTADATOS:a{:RESULT= new Hashtable(); RESULT.put("Lista",a);:}
+                    |SENTENCIADEFECTO:a{:RESULT= new Hashtable(); RESULT.put("Defecto",a);:};
+
+SENTENCIALISTADATOS ::=  abrir listadatos LISTAPARAMETROS:a cerrar LISTADEOPCIONES:b abrir listadatosc cerrar{:RESULT = new ListaDatos(a,b);:}
+                        |abrir listadatos cerrar LISTADEOPCIONES:a abrir listadatosc cerrar{:RESULT= new ListaDatos(null,a);:}
+                        |abrir listadatos LISTAPARAMETROS:a cerrar abrir listadatosc cerrar{:RESULT = new ListaDatos(a,null);:}
+                        |abrir listadatos cerrar abrir listadatosc cerrar{:RESULT = new ListaDatos();:};
+
+
+LISTADEOPCIONES ::= LISTADEOPCIONES:a SENTENCIADATO:b{:RESULT=a; RESULT.add(b);:}
+                    |SENTENCIADATO:a{:RESULT = new LinkedList(); RESULT.add(a);:};
+
+SENTENCIADATO ::= abrir dato LISTAPARAMETROS:a cerrar textoentrelineas:b datoc cerrar{:RESULT = new Dato(a,b);:}
+                  |abrir dato cerrar textoentrelineas:a datoc cerrar{:RESULT = new Dato(a);:};
+
+LISTAPARAMETROS ::= LISTAPARAMETROS:a PARAMETRO:b{:RESULT=a; RESULT.add(b);:}
+                    |PARAMETRO:a{:RESULT=new LinkedList(); RESULT.add(a);:};
+
+PARAMETRO ::= PROPIEDAD:p igual ATRIBUTO:a{:RESULT= new Parametro(p,a);:};
+
+PROPIEDAD ::= tipo:a{:RESULT=a;:}
+             |id :a{:RESULT=a;:}
+             |nombre:a{:RESULT=a;:}
+             |accioninicial:a{:RESULT=a;:}
+             |accionfinal:a{:RESULT=a;:}
+             |color:a{:RESULT=a;:}
+             |x:a{:RESULT=a;:}
+             |y:a{:RESULT=a;:}
+             |alto:a{:RESULT=a;:}
+             |ancho:a{:RESULT=a;:}
+             |borde:a{:RESULT=a;:}
+             |fuente:a{:RESULT=a;:}
+             |negrita:a{:RESULT=a;:}
+             |cursiva:a{:RESULT=a;:}
+             |tam:a{:RESULT=a;:}
+             |minimo:a{:RESULT=a;:}
+             |maximo:a{:RESULT=a;:}
+             |accion:a{:RESULT=a;:}
+             |referencia:a{:RESULT=a;:}
+             |path:a{:RESULT=a;:}
+             |reproduccion:a{:RESULT=a;:};
+
+ATRIBUTO ::= numero:a{:RESULT=new Numerico(a);:}
+            |Cadena:a{:RESULT=new Cadena(a);:}
+            |falso:a{:RESULT=new Booleano(a);:}
+            |verdadero:a{:RESULT=new Booleano(a);:}
+            |llamadametodo:a{:RESULT=new LlamadaMetodo(a);:};
+
+

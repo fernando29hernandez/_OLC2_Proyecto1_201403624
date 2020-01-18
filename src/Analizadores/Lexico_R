@@ -1,0 +1,185 @@
+package Analizadores;
+import java_cup.runtime.Symbol; 
+import Arbol.Entorno.Errores;
+%% 
+%cupsym Simbolo_R
+%class Lexico_R
+%public 
+%line 
+%char 
+%cup 
+%unicode
+
+%init{ 
+    yyline = 1; 
+    yychar = 1; 
+%init}  
+%{
+StringBuffer texto_auxiliar=new StringBuffer();
+String cadena_auxiliar = "";
+int bandera_regreso=0;
+%}
+
+Caracteres_no_importantes=[ \t\r\f\s\u2028|\u2029|\u000B|\u000C|\u0085]
+decimal=([0-9]+ "\." [0-9]+)
+identificador=([A-ZÑa-zñ]["_"0-9A-ZÑa-zñ]*)|(["_"]+[0-9A-ZÑa-zñ]["_"0-9A-ZÑa-zñ]*)
+entero=[0-9]+
+caracter=([\'](([^\\']))[\']) 
+comentario_de_una_linea=("//".*\r\n)|("//".*\n)|("//".*\r)
+blancos=[ \r\t]+
+caracternormal = [^\r\n]
+
+
+%state COMENTARIOS, RECONOCER_CADENA
+%%
+/***************************************** PALABRAS RESERVADAS ***********************************************/
+<YYINITIAL> "main"       {System.out.println(yytext());return new Symbol(Simbolo_R.principal,yyline,yychar, yytext());} 
+<YYINITIAL> "zro"       {System.out.println(yytext());return new Symbol(Simbolo_R.vacio,yyline,yychar, yytext());} 
+<YYINITIAL> "nlo"       {System.out.println(yytext());return new Symbol(Simbolo_R.nulo,yyline,yychar, yytext());} 
+<YYINITIAL> "ent"       {System.out.println(yytext());return new Symbol(Simbolo_R.tipoentero,yyline,yychar, yytext());} 
+<YYINITIAL> "chr"       {System.out.println(yytext());return new Symbol(Simbolo_R.tipocaracter,yyline,yychar, yytext());} 
+<YYINITIAL> "dec"       {System.out.println(yytext());return new Symbol(Simbolo_R.tipodecimal,yyline,yychar, yytext());} 
+<YYINITIAL> "bul"       {System.out.println(yytext());return new Symbol(Simbolo_R.tipoboleano,yyline,yychar, yytext());} 
+<YYINITIAL> "if"        {System.out.println(yytext());return new Symbol(Simbolo_R.si,yyline,yychar, yytext());} 
+<YYINITIAL> "else"      {System.out.println(yytext());return new Symbol(Simbolo_R.sino,yyline,yychar, yytext());} 
+<YYINITIAL> "while"     {System.out.println(yytext());return new Symbol(Simbolo_R.mientras,yyline,yychar, yytext());} 
+<YYINITIAL> "for"       {System.out.println(yytext());return new Symbol(Simbolo_R.ciclofor,yyline,yychar, yytext());} 
+<YYINITIAL> "repeat"    {System.out.println(yytext());return new Symbol(Simbolo_R.hacermientras,yyline,yychar, yytext());} 
+<YYINITIAL> "switch"    {System.out.println(yytext());return new Symbol(Simbolo_R.seleccion,yyline,yychar, yytext());} 
+<YYINITIAL> "case"      {System.out.println(yytext());return new Symbol(Simbolo_R.caso,yyline,yychar, yytext());} 
+<YYINITIAL> "default"   {System.out.println(yytext());return new Symbol(Simbolo_R.defecto,yyline,yychar, yytext());} 
+<YYINITIAL> "romper"    {System.out.println(yytext());return new Symbol(Simbolo_R.romper,yyline,yychar, yytext());} 
+<YYINITIAL> "siga"      {System.out.println(yytext());return new Symbol(Simbolo_R.siga,yyline,yychar, yytext());} 
+<YYINITIAL> "definir"   {System.out.println(yytext());return new Symbol(Simbolo_R.definir,yyline,yychar, yytext());} 
+<YYINITIAL> "fusion"    {System.out.println(yytext());return new Symbol(Simbolo_R.fusion,yyline,yychar, yytext());} 
+<YYINITIAL> "importar"  {System.out.println(yytext());return new Symbol(Simbolo_R.importar,yyline,yychar, yytext());} 
+<YYINITIAL> "regresar"  {System.out.println(yytext());return new Symbol(Simbolo_R.regresar,yyline,yychar, yytext());} 
+<YYINITIAL> "when"      {System.out.println(yytext());return new Symbol(Simbolo_R.cuando,yyline,yychar, yytext());} 
+<YYINITIAL> "true"      {System.out.println(yytext());return new Symbol(Simbolo_R.verdadero,yyline,yychar, yytext());} 
+<YYINITIAL> "false"     {System.out.println(yytext());return new Symbol(Simbolo_R.falso,yyline,yychar, yytext());}
+
+<YYINITIAL> "_pesode"   {System.out.println(yytext());return new Symbol(Simbolo_R.pesode,yyline,yychar, yytext());}
+<YYINITIAL> "_reservar" {System.out.println(yytext());return new Symbol(Simbolo_R.reservar,yyline,yychar, yytext());}
+
+<YYINITIAL> "_atxt"     {System.out.println(yytext());return new Symbol(Simbolo_R.atexto,yyline,yychar, yytext());}
+<YYINITIAL> "_conc"     {System.out.println(yytext());return new Symbol(Simbolo_R.concatenar,yyline,yychar, yytext());}
+<YYINITIAL> "_aent"     {System.out.println(yytext());return new Symbol(Simbolo_R.aentero,yyline,yychar, yytext());}
+<YYINITIAL> "_adec"     {System.out.println(yytext());return new Symbol(Simbolo_R.adecimal,yyline,yychar, yytext());}
+<YYINITIAL> "_eqls"     {System.out.println(yytext());return new Symbol(Simbolo_R.compequals,yyline,yychar, yytext());}
+<YYINITIAL> "_abrir_ventana"     {System.out.println(yytext());return new Symbol(Simbolo_R.mostrar_ventana,yyline,yychar, yytext());}
+
+<YYINITIAL> "_imp"       {System.out.println(yytext());return new Symbol(Simbolo_R.imprimir,yyline,yychar, yytext());}
+<YYINITIAL> "_write"     {System.out.println(yytext());return new Symbol(Simbolo_R.abrir,yyline,yychar, yytext());}
+<YYINITIAL> "_wf"        {System.out.println(yytext());return new Symbol(Simbolo_R.escribir,yyline,yychar, yytext());}
+<YYINITIAL> "_close"     {System.out.println(yytext());return new Symbol(Simbolo_R.cerrar,yyline,yychar, yytext());}
+<YYINITIAL> "_apend"     {System.out.println(yytext());return new Symbol(Simbolo_R.buscar_abrir,yyline,yychar, yytext());}
+<YYINITIAL> "_read"      {System.out.println(yytext());return new Symbol(Simbolo_R.leer,yyline,yychar, yytext());}
+<YYINITIAL> "Rlbl"       {System.out.println(yytext());return new Symbol(Simbolo_R.etiqueta,yyline,yychar, yytext());}
+<YYINITIAL> "Rtxt"       {System.out.println(yytext());return new Symbol(Simbolo_R.cajatexto,yyline,yychar, yytext());}
+<YYINITIAL> "RtxtA"      {System.out.println(yytext());return new Symbol(Simbolo_R.cajaareatexto,yyline,yychar, yytext());}
+<YYINITIAL> "RtxtP"      {System.out.println(yytext());return new Symbol(Simbolo_R.contrasena,yyline,yychar, yytext());}
+<YYINITIAL> "RtxtN"      {System.out.println(yytext());return new Symbol(Simbolo_R.cajanumero,yyline,yychar, yytext());}
+<YYINITIAL> "Rbton"      {System.out.println(yytext());return new Symbol(Simbolo_R.boton,yyline,yychar, yytext());}
+<YYINITIAL> "Rmensaje"   {System.out.println(yytext());return new Symbol(Simbolo_R.mensaje,yyline,yychar, yytext());}
+<YYINITIAL> "Rstring"    {System.out.println(yytext());return new Symbol(Simbolo_R.cadenaR,yyline,yychar, yytext());}
+
+<YYINITIAL> "iniciar_ventana"     {System.out.println(yytext());return new Symbol(Simbolo_R.iniciar,yyline,yychar, yytext());}
+<YYINITIAL> "al_dar_click"        {System.out.println(yytext());return new Symbol(Simbolo_R.click,yyline,yychar, yytext());}
+<YYINITIAL> "_Nuevo_GUI"          {System.out.println(yytext());return new Symbol(Simbolo_R.agregar_componente,yyline,yychar, yytext());}
+<YYINITIAL> "_alto_y_ancho"       {System.out.println(yytext());return new Symbol(Simbolo_R.tamform,yyline,yychar, yytext());}
+<YYINITIAL> "settexto"            {System.out.println(yytext());return new Symbol(Simbolo_R.settexto,yyline,yychar, yytext());}
+<YYINITIAL> "setancho"            {System.out.println(yytext());return new Symbol(Simbolo_R.setancho,yyline,yychar, yytext());}
+<YYINITIAL> "setalto"             {System.out.println(yytext());return new Symbol(Simbolo_R.setalto,yyline,yychar, yytext());}
+<YYINITIAL> "setpos"              {System.out.println(yytext());return new Symbol(Simbolo_R.setpos,yyline,yychar, yytext());}
+<YYINITIAL> "gettexto"            {System.out.println(yytext());return new Symbol(Simbolo_R.gettexto,yyline,yychar, yytext());}
+<YYINITIAL> "getancho"            {System.out.println(yytext());return new Symbol(Simbolo_R.getancho,yyline,yychar, yytext());}
+<YYINITIAL> "getalto"             {System.out.println(yytext());return new Symbol(Simbolo_R.getalto,yyline,yychar, yytext());}
+<YYINITIAL> "getpos"              {System.out.println(yytext());return new Symbol(Simbolo_R.getpos,yyline,yychar, yytext());}
+
+/**-------------------------------------------------------------------------------------------------------**/
+
+/************************************************* ESTADO DE CADENA  *****************************/
+
+<YYINITIAL> "\""                    {yybegin(RECONOCER_CADENA); cadena_auxiliar = ""; }
+<RECONOCER_CADENA> "\""             {System.out.println(cadena_auxiliar);yybegin(YYINITIAL); return new Symbol(Simbolo_R.cadena,yyline,yychar,cadena_auxiliar);}
+
+/*------------------------------------------------------------------------------------------------------ */
+/************************************************* CARACTERES DE ESCAPE  *****************************/
+<RECONOCER_CADENA> "\'"              {cadena_auxiliar = cadena_auxiliar + "\'"; }
+<RECONOCER_CADENA> "\\\""            {cadena_auxiliar = cadena_auxiliar + "\""; }
+<RECONOCER_CADENA> "\\?"             {cadena_auxiliar = cadena_auxiliar + "?"; }
+<RECONOCER_CADENA> "\\n"             {cadena_auxiliar = cadena_auxiliar + "\n"; }
+<RECONOCER_CADENA> \\\\              {cadena_auxiliar = cadena_auxiliar + "\\"; }
+<RECONOCER_CADENA> "\\0"             {cadena_auxiliar = cadena_auxiliar + '\0'; }
+<RECONOCER_CADENA> "\\b"             {cadena_auxiliar = cadena_auxiliar + '\b'; }
+<RECONOCER_CADENA> "\\f"             {cadena_auxiliar = cadena_auxiliar + '\f'; }
+<RECONOCER_CADENA> "\\r"             {cadena_auxiliar = cadena_auxiliar + '\r'; }
+<RECONOCER_CADENA> "\\t"             {cadena_auxiliar = cadena_auxiliar + '\t'; }
+<RECONOCER_CADENA> "\%"              {cadena_auxiliar = cadena_auxiliar + '%'; }
+/*------------------------------------------------------------------------------------------------------ */
+<RECONOCER_CADENA> .                {cadena_auxiliar = cadena_auxiliar + yytext(); }
+/************************************ SIGNOS DE EXPRESIONES **************************************************/
+<YYINITIAL> "="    {System.out.println(yytext());return new Symbol(Simbolo_R.igual,yyline,yychar, yytext());} 
+<YYINITIAL> "{"    {System.out.println(yytext());return new Symbol(Simbolo_R.abrirllave,yyline,yychar, yytext());} 
+<YYINITIAL> "}"    {System.out.println(yytext());return new Symbol(Simbolo_R.cerrarllave,yyline,yychar, yytext());} 
+<YYINITIAL> "("    {System.out.println(yytext());return new Symbol(Simbolo_R.abrirparentesis,yyline,yychar, yytext());} 
+<YYINITIAL> ")"    {System.out.println(yytext());return new Symbol(Simbolo_R.cerrarparentesis,yyline,yychar, yytext());} 
+<YYINITIAL> "["    {System.out.println(yytext());return new Symbol(Simbolo_R.abrircorchete,yyline,yychar, yytext());} 
+<YYINITIAL> "]"    {System.out.println(yytext());return new Symbol(Simbolo_R.cerrarcorchete,yyline,yychar, yytext());} 
+<YYINITIAL> "+"    {System.out.println(yytext());return new Symbol(Simbolo_R.mas,yyline,yychar, yytext());} 
+<YYINITIAL> "-"    {System.out.println(yytext());return new Symbol(Simbolo_R.menos,yyline,yychar, yytext());} 
+<YYINITIAL> "*"    {System.out.println(yytext());return new Symbol(Simbolo_R.por,yyline,yychar, yytext());} 
+<YYINITIAL> "/"    {System.out.println(yytext());return new Symbol(Simbolo_R.div,yyline,yychar, yytext());} 
+<YYINITIAL> "^"    {System.out.println(yytext());return new Symbol(Simbolo_R.potencia,yyline,yychar, yytext());} 
+<YYINITIAL> "%"    {System.out.println(yytext());return new Symbol(Simbolo_R.modulo,yyline,yychar, yytext());} 
+<YYINITIAL> "++"   {System.out.println(yytext());return new Symbol(Simbolo_R.masplus,yyline,yychar, yytext());} 
+<YYINITIAL> "--"   {System.out.println(yytext());return new Symbol(Simbolo_R.menosplus,yyline,yychar, yytext());} 
+<YYINITIAL> "||"   {System.out.println(yytext());return new Symbol(Simbolo_R.sumalogica,yyline,yychar, yytext());} 
+<YYINITIAL> "&&"   {System.out.println(yytext());return new Symbol(Simbolo_R.multiplicacionlogica,yyline,yychar, yytext());} 
+<YYINITIAL> "!"    {System.out.println(yytext());return new Symbol(Simbolo_R.notlogico,yyline,yychar, yytext());} 
+<YYINITIAL> "."    {System.out.println(yytext());return new Symbol(Simbolo_R.punto,yyline,yychar, yytext());} 
+<YYINITIAL> "<"    {System.out.println(yytext());return new Symbol(Simbolo_R.menor,yyline,yychar, yytext());} 
+<YYINITIAL> ">"    {System.out.println(yytext());return new Symbol(Simbolo_R.mayor,yyline,yychar, yytext());} 
+<YYINITIAL> ">="   {System.out.println(yytext());return new Symbol(Simbolo_R.mayorigual,yyline,yychar, yytext());} 
+<YYINITIAL> "<="   {System.out.println(yytext());return new Symbol(Simbolo_R.menorigual,yyline,yychar, yytext());} 
+<YYINITIAL> "=="   {System.out.println(yytext());return new Symbol(Simbolo_R.igualigual,yyline,yychar, yytext());} 
+<YYINITIAL> "<>"   {System.out.println(yytext());return new Symbol(Simbolo_R.diferente,yyline,yychar, yytext());} 
+<YYINITIAL> ","    {System.out.println(yytext());return new Symbol(Simbolo_R.coma,yyline,yychar, yytext());} 
+<YYINITIAL> ";"    {System.out.println(yytext());return new Symbol(Simbolo_R.puntocoma,yyline,yychar, yytext());} 
+<YYINITIAL> ":"    {System.out.println(yytext());return new Symbol(Simbolo_R.dospuntos,yyline,yychar, yytext());} 
+<YYINITIAL> "#"    {System.out.println(yytext());return new Symbol(Simbolo_R.numeral,yyline,yychar, yytext());} 
+
+/*------------------------------------------------------------------------------------------------------ */
+
+
+/**** PRIMITIVOS****************************************************************************/
+<YYINITIAL> {caracter}                                      {String resultado = yytext();resultado=resultado.replaceAll("'", "");System.out.println(resultado);return new Symbol(Simbolo_R.caracter,yyline,yychar,resultado);}
+<YYINITIAL> {entero}                                        {return new Symbol(Simbolo_R.entero,yyline,yychar, yytext());} 
+<YYINITIAL> {decimal}                                       {return new Symbol(Simbolo_R.decimal,yyline,yychar, yytext());} 
+<YYINITIAL> {identificador}                                 {return new Symbol(Simbolo_R.identificador,yyline,yychar, yytext());} 
+/*------------------------------------------------------------------------------------------------------ */
+
+<YYINITIAL> {blancos} {}
+<YYINITIAL> {comentario_de_una_linea} {yychar=1;System.out.println(yytext());}
+<YYINITIAL> [\n] {yychar=1;}
+<YYINITIAL> {Caracteres_no_importantes} { }
+
+
+/********* COMENTARIO MULTILINEA **********************/
+<YYINITIAL> "/*" {yybegin(COMENTARIOS);}
+<COMENTARIOS> "*/" {yybegin(YYINITIAL);}
+<COMENTARIOS> \n { yychar=1;}
+<COMENTARIOS> . {}
+/*------------------------------------------------------------------------------------------------------ */
+
+
+/********* ERRORES **********************/
+
+<YYINITIAL>. {
+    Errores.agregar_error("Caracter no reconocido: "+yytext(),yyline, yychar,"Lexico");
+        
+}
+. {
+    Errores.agregar_error("Caracter no reconocido: "+yytext(),yyline, yychar,"Lexico");
+}
+/*------------------------------------------------------------------------------------------------------ */
