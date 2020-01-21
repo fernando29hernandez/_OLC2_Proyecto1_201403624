@@ -17,10 +17,11 @@ public class VENTANA {
     public String nombre;
     public JFrame ventana;
     public LinkedList<Instruccion>instrucciones;
-    
-    public VENTANA(String nombre, LinkedList<Instruccion> instrucciones) {
+    public String nombre_archivo;
+    public VENTANA(String nombre, LinkedList<Instruccion> instrucciones,String nombre_archivo) {
         this.nombre=nombre;
         this.instrucciones = instrucciones;
+        this.nombre_archivo=nombre_archivo;
         //this.ventana=new JFrame();
     }
     public void PRECONFIGURAR_VENTANA()

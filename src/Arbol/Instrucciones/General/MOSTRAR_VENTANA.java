@@ -59,10 +59,13 @@ public class MOSTRAR_VENTANA extends Instruccion{
                     Display.nombre_ventana=mi_ventana.nombre;
                     Entorno nuevo =new Entorno(Display.GLOBAL);
                     Display.display.addFirst(Display.Tipo_Instruccion.funcion);
+                    String temporal = Display.ruta_archivo;
+                    Display.ruta_archivo = mi_ventana.nombre_archivo;
                     for(Instruccion ins:mi_ventana.instrucciones)
                     {
                         ins.Ejecutar(nuevo);
                     }
+                    Display.ruta_archivo = temporal;
                     Display.display.removeFirst();
                     Display.Constructor=false;
                     Display.nombre_ventana="";

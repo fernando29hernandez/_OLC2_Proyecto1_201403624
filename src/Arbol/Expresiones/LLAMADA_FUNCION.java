@@ -359,6 +359,9 @@ public class LLAMADA_FUNCION extends Expresion {
                 Display.display.removeFirst();
                 return error;
             }
+            /**
+             * POR SI ES UN METODO VOID O ZRO EN ESTE CASO DISMINUIR EL DISPLAY
+             */
             Display.display.removeFirst();
             return error;
         }

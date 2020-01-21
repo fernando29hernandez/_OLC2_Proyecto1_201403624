@@ -486,27 +486,26 @@ public class Principal_IDE extends javax.swing.JFrame {
             AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
             atmf.putMapping("text/myLanguage", "Analizadores.FLEXRSINTAX");
             textArea.setSyntaxEditingStyle("text/myLanguage");
-                    textArea.setBackground(Color.decode("#292c29"));
-                    textArea.setHighlightCurrentLine(false);
-                    SyntaxScheme personalizado = textArea.getSyntaxScheme();
-                    personalizado.getStyle(Token.DATA_TYPE).foreground = Color.cyan;
-                    personalizado.getStyle(Token.RESERVED_WORD).foreground = Color.decode("#cc0073");
-                    personalizado.getStyle(Token.FUNCTION).foreground =Color.decode("#a3fd44");
-                    personalizado.getStyle(Token.IDENTIFIER).foreground = Color.white;
-                    personalizado.getStyle(Token.LITERAL_STRING_DOUBLE_QUOTE).foreground = Color.decode("#ffff40");
-                    personalizado.getStyle(Token.LITERAL_CHAR).foreground = Color.decode("#ffff40");
-                    personalizado.getStyle(Token.LITERAL_NUMBER_DECIMAL_INT).foreground = Color.decode("#826095");
-                    textArea.setCodeFoldingEnabled(true);
-                    
-            
+            textArea.setBackground(Color.decode("#292c29"));
+            textArea.setHighlightCurrentLine(false);
+            SyntaxScheme personalizado = textArea.getSyntaxScheme();
+            personalizado.getStyle(Token.DATA_TYPE).foreground = Color.cyan;
+            personalizado.getStyle(Token.RESERVED_WORD).foreground = Color.decode("#cc0073");
+            personalizado.getStyle(Token.FUNCTION).foreground = Color.decode("#a3fd44");
+            personalizado.getStyle(Token.IDENTIFIER).foreground = Color.white;
+            personalizado.getStyle(Token.LITERAL_STRING_DOUBLE_QUOTE).foreground = Color.decode("#ffff40");
+            personalizado.getStyle(Token.LITERAL_CHAR).foreground = Color.decode("#ffff40");
+            personalizado.getStyle(Token.LITERAL_NUMBER_DECIMAL_INT).foreground = Color.decode("#826095");
+            textArea.setCodeFoldingEnabled(true);
+
         } catch (Exception e) {
 
         }
-            textArea.setCodeFoldingEnabled(true);
-            RTextScrollPane sp = new RTextScrollPane(textArea);
-            agregar_contador(textArea, sp);
-            pestañas.addTab("Pestaña " + (pestañas.getComponentCount() + 1), sp);
-            pestañas.setSelectedIndex(pestañas.getComponentCount() - 1);
+        textArea.setCodeFoldingEnabled(true);
+        RTextScrollPane sp = new RTextScrollPane(textArea);
+        agregar_contador(textArea, sp);
+        pestañas.addTab("Pestaña " + (pestañas.getComponentCount() + 1), sp);
+        pestañas.setSelectedIndex(pestañas.getComponentCount() - 1);
         //textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_C);
 
 
@@ -575,7 +574,7 @@ public class Principal_IDE extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItem5ActionPerformed
     /**
-     * CUANDO ES _PESODE(chr[])
+     * 
      *
      * @param evt
      */
@@ -609,25 +608,24 @@ public class Principal_IDE extends javax.swing.JFrame {
                     SyntaxScheme personalizado = textArea.getSyntaxScheme();
                     personalizado.getStyle(Token.DATA_TYPE).foreground = Color.cyan;
                     personalizado.getStyle(Token.RESERVED_WORD).foreground = Color.decode("#cc0073");
-                    personalizado.getStyle(Token.FUNCTION).foreground =Color.decode("#a3fd44");
+                    personalizado.getStyle(Token.FUNCTION).foreground = Color.decode("#a3fd44");
                     personalizado.getStyle(Token.IDENTIFIER).foreground = Color.white;
                     personalizado.getStyle(Token.LITERAL_STRING_DOUBLE_QUOTE).foreground = Color.decode("#ffd6af");
                     personalizado.getStyle(Token.LITERAL_CHAR).foreground = Color.decode("#ffd6af");
                     personalizado.getStyle(Token.LITERAL_NUMBER_DECIMAL_INT).foreground = Color.decode("#826095");
                     textArea.setCodeFoldingEnabled(true);
-                    
-                    
+
                 } catch (Exception e) {
 
                 }
                 RTextScrollPane sp = new RTextScrollPane(textArea);
                 agregar_contador(textArea, sp);
-                    
+
                 pestañas.addTab("Pestaña " + (pestañas.getComponentCount() + 1), sp);
-                    pestañas.setSelectedIndex(pestañas.getComponentCount() - 1);
-                    textArea.setText(contenido);
-                    textArea.setName(archivo.getPath()); //Esto es para guardarlo
-                    pestañas.setTitleAt(pestañas.getSelectedIndex(), archivo.getName());//Solo jalo el nombre del archivo
+                pestañas.setSelectedIndex(pestañas.getComponentCount() - 1);
+                textArea.setText(contenido);
+                textArea.setName(archivo.getPath()); //Esto es para guardarlo
+                pestañas.setTitleAt(pestañas.getSelectedIndex(), archivo.getName());//Solo jalo el nombre del archivo
 //                JTextArea txt = new JTextArea();
 //                txt.setFont(new Font("Ubuntu", Font.PLAIN, 12));
 //                JScrollPane scroll = new JScrollPane(txt);
@@ -791,6 +789,11 @@ public class Principal_IDE extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
+        /**
+         * EN SU DISCO C:/ tiens que existir una carpeta que se llame como la que esta aqui abajo
+         *  Reportes
+         * Los reportes de tabla de simbolos y errores se pueden crear durante la ejecucion o al final no importa 
+         */
         try {
             File archivo = new File("C:/Reportes/TablaSimbolos.html");
             PrintWriter writer = new PrintWriter(archivo);
@@ -964,15 +967,14 @@ public class Principal_IDE extends javax.swing.JFrame {
                     SyntaxScheme personalizado = textArea.getSyntaxScheme();
                     personalizado.getStyle(Token.DATA_TYPE).foreground = Color.cyan;
                     personalizado.getStyle(Token.RESERVED_WORD).foreground = Color.decode("#cc0073");
-                    personalizado.getStyle(Token.FUNCTION).foreground =Color.decode("#a3fd44");
+                    personalizado.getStyle(Token.FUNCTION).foreground = Color.decode("#a3fd44");
                     personalizado.getStyle(Token.IDENTIFIER).foreground = Color.white;
                     personalizado.getStyle(Token.LITERAL_STRING_DOUBLE_QUOTE).foreground = Color.decode("#ffff40");
                     personalizado.getStyle(Token.LITERAL_CHAR).foreground = Color.decode("#ffff40");
                     personalizado.getStyle(Token.LITERAL_NUMBER_DECIMAL_INT).foreground = Color.decode("#826095");
                     textArea.setCodeFoldingEnabled(true);
-                    
+
                     //agregar_contador(textArea, sp);
-                    
                 } catch (Exception e) {
 
                 }
@@ -1239,7 +1241,7 @@ public class Principal_IDE extends javax.swing.JFrame {
      * @param cadena_archivo
      */
     public void CargaEstructuraDirectorios2(DefaultTreeModel arbol,
-            DefaultMutableTreeNode padre, String ruta, GENERAR_OLC cadena_archivo) {
+        DefaultMutableTreeNode padre, String ruta, GENERAR_OLC cadena_archivo) {
         cadena_archivo.cantidad_r += "\t";
         DefaultMutableTreeNode aux = null;
 

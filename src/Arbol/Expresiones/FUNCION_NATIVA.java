@@ -111,7 +111,7 @@ public class FUNCION_NATIVA extends Expresion {
                                 return new PRIMITIVO(new Tipo(Tipo.TipoSimbolo.entero), 1, 0, 0);
 
                             }
-                            System.out.println("el valor de RSTRING COMO PESO DE ES:"+temp.valor.toString().length());
+                            System.out.println("el valor de RSTRING COMO PESO DE ES:" + temp.valor.toString().length());
                             return new PRIMITIVO(new Tipo(Tipo.TipoSimbolo.entero), temp.valor.toString().length(), 0, 0);
 
                         } else {
@@ -203,7 +203,7 @@ public class FUNCION_NATIVA extends Expresion {
                             }
                             primer_disponible++;
                         }
-                        int verificacion = sim.tams.tamano_actual - (primer_disponible-1);
+                        int verificacion = sim.tams.tamano_actual - (primer_disponible - 1);
                         Boolean resultado_pasar = verificacion >= sim2.tams.tamano_actual;
                         if (resultado_pasar) {
                             primer_disponible = primer_disponible - 1;
@@ -409,7 +409,7 @@ public class FUNCION_NATIVA extends Expresion {
                                 JTextArea temp_comp = (JTextArea) comp.caja;
                                 temp_comp.setText(transform);
                             } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajanum) {
-                                JSpinner  temp_comp = (JSpinner ) comp.componente;
+                                JSpinner temp_comp = (JSpinner) comp.componente;
                                 temp_comp.setValue(transform);
                             } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajapass) {
                                 JPasswordField temp_comp = (JPasswordField) comp.componente;
@@ -445,8 +445,14 @@ public class FUNCION_NATIVA extends Expresion {
                                     JTextArea temp_comp = (JTextArea) comp.caja;
                                     temp_comp.setText(transform);
                                 } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajanum) {
-                                    JSpinner  temp_comp = (JSpinner ) comp.componente;
-                                    temp_comp.setValue(transform);
+                                    JSpinner temp_comp = (JSpinner) comp.componente;
+                                    try {
+                                        temp_comp.setValue(transform);
+                                    } catch (Exception e) {
+                                        Errores.agregar_error("Valor no valido para un tipo RtxtN en Settexto", fila, columna,"Semantico");
+                                        temp_comp.setValue(0);
+                                    }
+
                                 } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajapass) {
                                     JPasswordField temp_comp = (JPasswordField) comp.componente;
                                     temp_comp.setText(transform);
@@ -501,7 +507,7 @@ public class FUNCION_NATIVA extends Expresion {
                                 JScrollPane temp_comp = (JScrollPane) comp.componente;
                                 temp_comp.setSize(temp_comp.getSize().width, valor_);
                             } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajanum) {
-                                JSpinner  temp_comp = (JSpinner ) comp.componente;
+                                JSpinner temp_comp = (JSpinner) comp.componente;
                                 temp_comp.setSize(temp_comp.getSize().width, valor_);
                             } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajapass) {
                                 JPasswordField temp_comp = (JPasswordField) comp.componente;
@@ -553,7 +559,7 @@ public class FUNCION_NATIVA extends Expresion {
                                 JScrollPane temp_comp = (JScrollPane) comp.componente;
                                 temp_comp.setSize(valor_, temp_comp.getSize().height);
                             } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajanum) {
-                                JSpinner  temp_comp = (JSpinner ) comp.componente;
+                                JSpinner temp_comp = (JSpinner) comp.componente;
                                 temp_comp.setSize(valor_, temp_comp.getSize().height);
                             } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajapass) {
                                 JPasswordField temp_comp = (JPasswordField) comp.componente;
@@ -610,7 +616,7 @@ public class FUNCION_NATIVA extends Expresion {
                                 JScrollPane temp_comp = (JScrollPane) comp.componente;
                                 temp_comp.setBounds(valor_, valor_2, temp_comp.getSize().width, temp_comp.getSize().height);
                             } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajanum) {
-                                JSpinner  temp_comp = (JSpinner ) comp.componente;
+                                JSpinner temp_comp = (JSpinner) comp.componente;
                                 temp_comp.setBounds(valor_, valor_2, temp_comp.getSize().width, temp_comp.getSize().height);
                             } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajapass) {
                                 JPasswordField temp_comp = (JPasswordField) comp.componente;
@@ -659,7 +665,7 @@ public class FUNCION_NATIVA extends Expresion {
                         JTextArea caja = comp.caja;
                         cadena_extraida = caja.getText();
                     } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajanum) {
-                        JSpinner  temp_comp = (JSpinner ) comp.componente;
+                        JSpinner temp_comp = (JSpinner) comp.componente;
                         cadena_extraida = temp_comp.getValue().toString();
                     } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajapass) {
                         JPasswordField temp_comp = (JPasswordField) comp.componente;
@@ -696,7 +702,7 @@ public class FUNCION_NATIVA extends Expresion {
                         JScrollPane temp_comp = (JScrollPane) comp.componente;
                         tamano = temp_comp.getWidth();
                     } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajanum) {
-                        JSpinner  temp_comp = (JSpinner ) comp.componente;
+                        JSpinner temp_comp = (JSpinner) comp.componente;
                         tamano = temp_comp.getWidth();
                     } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajapass) {
                         JPasswordField temp_comp = (JPasswordField) comp.componente;
@@ -733,7 +739,7 @@ public class FUNCION_NATIVA extends Expresion {
                         JScrollPane temp_comp = (JScrollPane) comp.componente;
                         tamano = temp_comp.getHeight();
                     } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajanum) {
-                        JSpinner  temp_comp = (JSpinner ) comp.componente;
+                        JSpinner temp_comp = (JSpinner) comp.componente;
                         tamano = temp_comp.getHeight();
                     } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajapass) {
                         JPasswordField temp_comp = (JPasswordField) comp.componente;
@@ -775,7 +781,7 @@ public class FUNCION_NATIVA extends Expresion {
                         posx = temp_comp.getX();
                         posy = temp_comp.getY();
                     } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajanum) {
-                        JSpinner  temp_comp = (JSpinner ) comp.componente;
+                        JSpinner temp_comp = (JSpinner) comp.componente;
                         posx = temp_comp.getX();
                         posy = temp_comp.getY();
                     } else if (comp.tipo.tipo_comp == Tipo.TipoComponente.cajapass) {

@@ -89,7 +89,7 @@ public class FUNCION extends Instruccion {
                 this.nombre_archivo_origen = Display.ruta_archivo;
 
                 nombre_unico_funcion = "VENTANA_" + Display.nombre_archivo_activo;
-                VENTANA nueva = new VENTANA(nombre_unico_funcion, instruciones);
+                VENTANA nueva = new VENTANA(nombre_unico_funcion, instruciones,this.nombre_archivo_origen);
                 Simbolo nueva_ventana = new Simbolo(new Tipo(Tipo.TipoSimbolo.ventana), nombre_unico_funcion, nueva);
                 Display.GLOBAL.insertar(nombre_unico_funcion, nueva_ventana, fila, columna);
                 return null;
@@ -97,6 +97,9 @@ public class FUNCION extends Instruccion {
                 this.extension_origen = Display.extension_archivo_activo;
                 this.nombre_archivo_origen = Display.ruta_archivo;
                 Simbolo nueva_funcion = new Simbolo(tipo, "BOTON_" + identificador, this);
+                /**
+                 * CAMBIO A BOTON_
+                 */
                 tablasimbolos.insertar("FUNCION_" + identificador, nueva_funcion, fila, columna);
                 return null;
             }
